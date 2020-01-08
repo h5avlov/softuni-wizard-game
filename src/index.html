@@ -4,18 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Softuni Wizard Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="game">
-    <div class="game-start"></div>
+    <div class="game-start">Press To Play</div>
     <div class="game-play">
 
-        <div class="score"></div>
-        
+        <div class="score">1200</div>
+
     </div>
     <div class="game-over"></div>
 </div>
+
+<script>
+
+    const gameStart = getElement( ".game-start" ), 
+        gamePlay = getElement( '.game-play' ), 
+        gameOver = getElement( '.game-over' ), 
+        score = getElement( '.score' ); 
+
+    gameStart.addEventListener( 'click', start ); 
+
+    function start() { 
+        // Hiding the start button
+        gameStart.classList.add( 'hidden' ); 
+
+    }
+
+    function getElement( selector ) { 
+        return document.querySelector( selector ); 
+    }
+
+</script>
     
 </body>
 </html>
