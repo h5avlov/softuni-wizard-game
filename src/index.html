@@ -27,12 +27,29 @@
 
     gameStart.addEventListener( 'click', start ); 
 
+    // Appends newly created element to the provided wrapper
+    function insertEntity( entity, wrapper ) { 
+        wrapper.appendChild( entity );
+    }
+
+    // Creates an element with the provided class name and returns it 
+    function buildEntity( className ) { 
+        const character = document.createElement( 'div' );
+        character.classList.add( className ); 
+        return character;
+    }
+
+    // Starts the gameplay
     function start() { 
-        // Hiding the start button
+        // Hiding the start button after click 
         gameStart.classList.add( 'hidden' ); 
+
+        // Inserting the main character in the game
+        insertEntity( buildEntity( 'wizard' ), gamePlay );
 
     }
 
+    // Gets a ref to a DOM element
     function getElement( selector ) { 
         return document.querySelector( selector ); 
     }

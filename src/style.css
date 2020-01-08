@@ -53,6 +53,14 @@ body {
 
 }
 
+.wizard { 
+    width: 82px; height: 100px; 
+    position: absolute; bottom: 0; 
+    background-image: url( './images/wizard.png' ); 
+    background-size: cover; 
+
+}
+
 /* Class to give to an element to remove it from the screen */
 .hidden { 
     display: none; 
