@@ -31,38 +31,73 @@
     document.addEventListener( 'keydown', onKeyDown );
     document.addEventListener( 'keyup', onKeyUp ); 
 
+    // Creating the main character 
+    const wizard = buildEntity( [ 'wizard' ] );  
+
+    // Starts the gameplay
+    function start() { 
+        // Hiding the start button after click 
+        hide( gameStart );
+
+        // Inserting the main character in the DOM
+        insertEntity( wizard, gamePlay ); 
+
+        // Starting the game loop
+        requestAnimationFrame( gameMove ); 
+
+    }
+
     const keys = {};
+    const player = { 
+        left: 0, 
+        bottom: 0 
+    }; 
+    const game = { 
+        speed: 10, 
+    }; 
+
+    function gameMove() { 
+        if ( keys.ArrowLeft ) { 
+            player.left -= game.speed; 
+        }
+        if ( keys.ArrowUp ) { 
+            player.bottom += game.speed; 
+        }
+        if ( keys.ArrowRight ) { 
+            player.left += game.speed; 
+        }
+        if ( keys.ArrowDown ) { 
+            player.bottom -= game.speed;
+        }
+
+        wizard.style.left = player.left + 'px'; 
+        wizard.style.bottom = player.bottom + 'px'; 
+
+        requestAnimationFrame( gameMove ); 
+    }
 
     function onKeyUp( e ) { 
-        e.preventDefault();
         keys[ e.code ] = false; 
     }
 
     function onKeyDown( e ) {
-        e.preventDefault(); 
         keys[ e.code ] = true; 
     }
 
     // Appends newly created element to the provided wrapper
     function insertEntity( entity, wrapper ) { 
-        wrapper.appendChild( entity );
+        wrapper.appendChild( entity ); 
     }
 
     // Creates an element with the provided class name and returns it 
-    function buildEntity( className ) { 
+    function buildEntity( classNames ) { 
         const character = document.createElement( 'div' );
-        character.classList.add( className ); 
+        character.classList.add( ...classNames ); 
         return character;
     }
 
-    // Starts the gameplay
-    function start() { 
-        // Hiding the start button after click 
-        gameStart.classList.add( 'hidden' ); 
-
-        // Inserting the main character in the game
-        insertEntity( buildEntity( 'wizard' ), gamePlay );
-
+    function hide( element ) { 
+        element.classList.add( 'hidden' ); 
     }
 
     // Gets a ref to a DOM element
