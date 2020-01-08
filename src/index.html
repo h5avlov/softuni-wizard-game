@@ -33,14 +33,13 @@
 
     // Creating the main character 
     const wizard = buildEntity( [ 'wizard' ] );  
+    // Inserting the main character in the DOM
+    insertEntity( wizard, gamePlay ); 
 
     // Starts the gameplay
     function start() { 
         // Hiding the start button after click 
         hide( gameStart );
-
-        // Inserting the main character in the DOM
-        insertEntity( wizard, gamePlay ); 
 
         // Starting the game loop
         requestAnimationFrame( gameMove ); 
@@ -49,29 +48,33 @@
 
     const keys = {};
     const player = { 
+        width: wizard.offsetWidth, 
+        height: wizard.offsetHeight, 
         left: 0, 
         bottom: 0 
     }; 
     const game = { 
-        baseSpeed: 5, 
+        areaWidth: gamePlay.offsetWidth, 
+        areaHeight: gamePlay.offsetHeight, 
+        baseSpeed: 10, 
         multiplier: 1.25, 
         speed: function() { 
             return this.baseSpeed * this.multiplier; 
         }
-
     }; 
 
     function gameMove() { 
-        if ( keys.ArrowLeft ) { 
+        if ( keys.ArrowLeft && player.left > 0 ) { 
             player.left -= game.speed(); 
         }
-        if ( keys.ArrowUp ) { 
+        if ( keys.ArrowUp && player.bottom < game.areaHeight - player.height ) { 
+            console.log( game.areaHeight );
             player.bottom += game.speed(); 
         }
-        if ( keys.ArrowRight ) { 
+        if ( keys.ArrowRight && player.left < game.areaWidth - player.width ) { 
             player.left += game.speed(); 
         }
-        if ( keys.ArrowDown ) { 
+        if ( keys.ArrowDown && player.bottom > 0 ) { 
             player.bottom -= game.speed();
         }
 
