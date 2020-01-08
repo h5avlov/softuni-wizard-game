@@ -53,21 +53,26 @@
         bottom: 0 
     }; 
     const game = { 
-        speed: 10, 
+        baseSpeed: 5, 
+        multiplier: 1.25, 
+        speed: function() { 
+            return this.baseSpeed * this.multiplier; 
+        }
+
     }; 
 
     function gameMove() { 
         if ( keys.ArrowLeft ) { 
-            player.left -= game.speed; 
+            player.left -= game.speed(); 
         }
         if ( keys.ArrowUp ) { 
-            player.bottom += game.speed; 
+            player.bottom += game.speed(); 
         }
         if ( keys.ArrowRight ) { 
-            player.left += game.speed; 
+            player.left += game.speed(); 
         }
         if ( keys.ArrowDown ) { 
-            player.bottom -= game.speed;
+            player.bottom -= game.speed();
         }
 
         wizard.style.left = player.left + 'px'; 
@@ -96,6 +101,7 @@
         return character;
     }
 
+    // Hides an element 
     function hide( element ) { 
         element.classList.add( 'hidden' ); 
     }
