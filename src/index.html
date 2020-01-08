@@ -20,12 +20,28 @@
 
 <script>
 
+    // Getting referencess for the game components from the DOM
     const gameStart = getElement( ".game-start" ), 
         gamePlay = getElement( '.game-play' ), 
         gameOver = getElement( '.game-over' ), 
         score = getElement( '.score' ); 
 
+    // Game related events catching
     gameStart.addEventListener( 'click', start ); 
+    document.addEventListener( 'keydown', onKeyDown );
+    document.addEventListener( 'keyup', onKeyUp ); 
+
+    const keys = {};
+
+    function onKeyUp( e ) { 
+        e.preventDefault();
+        keys[ e.code ] = false; 
+    }
+
+    function onKeyDown( e ) {
+        e.preventDefault(); 
+        keys[ e.code ] = true; 
+    }
 
     // Appends newly created element to the provided wrapper
     function insertEntity( entity, wrapper ) { 
