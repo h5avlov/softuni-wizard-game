@@ -29,11 +29,6 @@
     document.addEventListener( 'keydown', onKeyDown );
     document.addEventListener( 'keyup', onKeyUp ); 
 
-    // Creating the main character 
-    const wizard = buildEntity( [ 'wizard' ] );  
-    // Inserting the main character in the DOM
-    insertEntity( wizard, gamePlay ); 
-
     const keys = {};
     const game = { 
         areaWidth: gamePlay.offsetWidth, 
@@ -45,7 +40,12 @@
             return this.baseSpeed * this.multiplier; 
         }
     }; 
-    const player = ( function( wizard ) { 
+    const player = ( function() { 
+        // Creating the main character 
+        const wizard = buildEntity( [ 'wizard' ] );  
+        // Inserting the main character in the DOM
+        insertEntity( wizard, gamePlay ); 
+        
         const width = wizard.offsetWidth, 
             height = wizard.offsetHeight, 
             gravityMultiplier = 1, 
@@ -150,7 +150,7 @@
             moveDown, 
             applyGravity 
         }; 
-    }( wizard ) ); 
+    }() ); 
 
     // Starts the gameplay
     function start() { 
