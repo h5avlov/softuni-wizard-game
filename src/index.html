@@ -40,13 +40,16 @@
         areaHeight: gamePlay.offsetHeight, 
         baseSpeed: 10, 
         multiplier: 1, 
+        gravity: 5, 
         speed: function() { 
             return this.baseSpeed * this.multiplier; 
         }
     }; 
     const player = ( function( wizard ) { 
         const width = wizard.offsetWidth, 
-            height = wizard.offsetHeight;
+            height = wizard.offsetHeight, 
+            gravityMultiplier = 1, 
+            gravity = gravityMultiplier * game.gravity; 
         let left = getCSSValue( wizard, 'left' ), 
             bottom = getCSSValue( wizard, 'bottom' ); 
 
@@ -96,6 +99,14 @@
             return bottom <= 0; 
         }
 
+        function applyGravity() { 
+            if ( isAtBottomBorder() ) { 
+                return;
+            }
+            bottom -= gravity; 
+            wizard.style.bottom = assignPixelValue( bottom ); 
+        }
+
         function getTop() { 
             return game.areaHeight - bottom - height;
         }
@@ -113,14 +124,15 @@
             moveLeft, 
             moveTop, 
             moveRight, 
-            moveBottom
+            moveBottom, 
+            applyGravity 
         }; 
     }( wizard ) ); 
 
     // Starts the gameplay
     function start() { 
         // Hiding the start button after click 
-        hide( gameStart );
+        hide( gameStart ); 
 
         // Starting the game loop
         requestAnimationFrame( gameMove ); 
@@ -128,6 +140,8 @@
     }
 
     function gameMove() { 
+        player.applyGravity(); 
+
         if ( keys.ArrowLeft ) { 
             player.moveLeft(); 
         }
@@ -139,7 +153,7 @@
         }
         if ( keys.ArrowDown ) { 
             player.moveBottom();  
-        }
+        } 
 
         requestAnimationFrame( gameMove ); 
     }
