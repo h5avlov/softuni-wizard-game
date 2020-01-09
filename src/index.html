@@ -12,7 +12,7 @@
     <div class="game-start">Press To Play</div>
     <div class="game-play">
 
-        <div class="score">1200</div>
+        <div class="game-score">1200</div>
 
     </div>
     <div class="game-over"></div>
@@ -50,8 +50,8 @@
     const player = { 
         width: wizard.offsetWidth, 
         height: wizard.offsetHeight, 
-        left: 0, 
-        bottom: 0 
+        left: getCSSValue( wizard, 'left' ), 
+        bottom: getCSSValue( wizard, 'bottom' ) 
     }; 
     const game = { 
         areaWidth: gamePlay.offsetWidth, 
@@ -64,24 +64,35 @@
     }; 
 
     function gameMove() { 
-        if ( keys.ArrowLeft && player.left > 0 ) { 
+        const isAtTopBorder = player.bottom >= game.areaHeight - player.height, 
+            isAtRightBorder = player.left >= game.areaWidth - player.width, 
+            isAtLeftBorder = player.left <= 0, 
+            isAtBottomBorder = player.bottom <= 0;
+
+        if ( keys.ArrowLeft && !isAtLeftBorder ) { 
             player.left -= game.speed(); 
         }
-        if ( keys.ArrowUp && player.bottom < game.areaHeight - player.height ) { 
+        if ( keys.ArrowUp && !isAtTopBorder ) { 
             console.log( game.areaHeight );
             player.bottom += game.speed(); 
         }
-        if ( keys.ArrowRight && player.left < game.areaWidth - player.width ) { 
+        if ( keys.ArrowRight && !isAtRightBorder ) { 
             player.left += game.speed(); 
         }
-        if ( keys.ArrowDown && player.bottom > 0 ) { 
-            player.bottom -= game.speed();
+        if ( keys.ArrowDown && !isAtBottomBorder ) { 
+            player.bottom -= game.speed(); 
         }
 
         wizard.style.left = player.left + 'px'; 
         wizard.style.bottom = player.bottom + 'px'; 
 
         requestAnimationFrame( gameMove ); 
+    }
+
+    function getCSSValue( element, property ) { 
+        const valueString = getComputedStyle( element ).getPropertyValue( property ), 
+            value = parseInt( valueString ); 
+        return value; 
     }
 
     function onKeyUp( e ) { 

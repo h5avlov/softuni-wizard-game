@@ -8,18 +8,17 @@ html {
     font-size: 14px; 
 }
 
-body, .game, .game-play { 
+body, .game, .game-play, .game-score { 
+    width: 100%;
     position: absolute; left: 0; top: 0; 
 }
 
 body {  
-    box-sizing: border-box; 
-    width: 100%;  
-}
+    box-sizing: border-box;   
+} 
 
-.game { 
-    width: 100%; height: 100%;  
-    /* background-color: red;  */
+.game, .game-play { 
+    height: 100%;
 }
 
 .game-start { 
@@ -35,15 +34,12 @@ body {
 }
 
 .game-play { 
-    width: 100%; height: 100%;
     z-index: 1; 
     background-color: red;
 }
 
-.score { 
+.game-score { 
     box-sizing: border-box; 
-    width: 100%; 
-    position: absolute; left: 0; top: 0; 
     padding: 0.75em; 
     background-color: white;
     color: red; 
@@ -52,13 +48,9 @@ body {
 
 }
 
-.game-over {
-
-}
-
 .wizard { 
     width: 82px; height: 100px; 
-    position: absolute; bottom: 0; 
+    position: absolute; left: 100px; bottom: 100px; 
     background-image: url( './images/wizard.png' ); 
     background-size: cover; 
 
