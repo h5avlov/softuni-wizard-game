@@ -13,10 +13,6 @@ body, .game, .game-play, .game-score {
     position: absolute; left: 0; top: 0; 
 }
 
-body {  
-    box-sizing: border-box;   
-} 
-
 .game, .game-play { 
     height: 100%;
 }
@@ -53,7 +49,8 @@ body {
     position: absolute; left: 100px; bottom: 100px; 
     background-image: url( './images/wizard.png' ); 
     background-size: cover; 
-
+    background-color: blue; 
+    overflow: hidden; 
 }
 
 /* Class to give to an element to remove it from the screen */

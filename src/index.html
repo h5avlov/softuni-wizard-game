@@ -11,9 +11,7 @@
 <div class="game">
     <div class="game-start">Press To Play</div>
     <div class="game-play">
-
         <div class="game-score">1200</div>
-
     </div>
     <div class="game-over"></div>
 </div>
@@ -24,7 +22,7 @@
     const gameStart = getElement( ".game-start" ), 
         gamePlay = getElement( '.game-play' ), 
         gameOver = getElement( '.game-over' ), 
-        score = getElement( '.score' ); 
+        gameScore = getElement( '.score' ); 
 
     // Game related events catching
     gameStart.addEventListener( 'click', start ); 
@@ -36,64 +34,49 @@
     // Inserting the main character in the DOM
     insertEntity( wizard, gamePlay ); 
 
-    // Starts the gameplay
-    function start() { 
-        // Hiding the start button after click 
-        hide( gameStart );
-
-        // Starting the game loop
-        requestAnimationFrame( gameMove ); 
-
-    }
-
     const keys = {};
     const game = { 
         areaWidth: gamePlay.offsetWidth, 
         areaHeight: gamePlay.offsetHeight, 
         baseSpeed: 10, 
-        multiplier: 1.25, 
+        multiplier: 1, 
         speed: function() { 
             return this.baseSpeed * this.multiplier; 
         }
     }; 
     const player = ( function( wizard ) { 
+        const width = wizard.offsetWidth, 
+            height = wizard.offsetHeight;
         let left = getCSSValue( wizard, 'left' ), 
-            top = getCSSValue( wizard, 'top' ), 
-            right = getCSSValue( wizard, 'right' ),
-            bottom = getCSSValue( wizard, 'bottom' );
+            bottom = getCSSValue( wizard, 'bottom' ); 
 
         function moveLeft() { 
-            if ( isAtLeftBorder() ) {
+            if ( isAtLeftBorder() ) { 
                 return;
-            }
+            } 
             left -= game.speed(); 
-            right += game.speed(); 
-            wizard.style.left = assignPixelValue( left ); 
+            wizard.style.left = assignPixelValue( left );
         }
         function moveTop() { 
             if ( isAtTopBorder() ) {
                 return;
             }
-            top -= game.speed(); 
-            bottom += game.speed(); 
-            wizard.style.top = assignPixelValue( top );
+            bottom += Math.min( getTop(), game.speed() ); 
+            wizard.style.bottom = assignPixelValue( bottom );
         }
         function moveRight() { 
             if ( isAtRightBorder() ) {
                 return;
             }
-            right -= game.speed(); 
-            left += game.speed(); 
-            wizard.style.left = 'auto'; 
-            wizard.style.right = assignPixelValue( right );
+            
+            left += Math.min( getRight(), game.speed() ); 
+            wizard.style.left = assignPixelValue( left );
         }
         function moveBottom() { 
             if ( isAtBottomBorder() ) {
                 return;
             }
             bottom -= game.speed(); 
-            top += game.speed(); 
-            wizard.style.top = 'auto'; 
             wizard.style.bottom = assignPixelValue( bottom ); 
         }
 
@@ -102,15 +85,28 @@
         } 
 
         function isAtTopBorder() {
-            return top <= 0;
+            return bottom > game.areaHeight - height; 
         }
 
         function isAtRightBorder() {
-            return right <= 0;
+            return left >= game.areaWidth - width - 10; 
         }
 
         function isAtBottomBorder() { 
-            return bottom <= 0;
+            return bottom <= 0; 
+        }
+
+        function getTop() { 
+            return game.areaHeight - bottom - height;
+        }
+
+        function getRight() { 
+            return game.areaWidth - left - width; 
+        }
+
+        function setPosition() {
+            wizard.style.left = assignPixelValue( left );
+            wizard.style.bottom = assignPixelValue( bottom ); 
         }
 
         return {
@@ -121,6 +117,15 @@
         }; 
     }( wizard ) ); 
 
+    // Starts the gameplay
+    function start() { 
+        // Hiding the start button after click 
+        hide( gameStart );
+
+        // Starting the game loop
+        requestAnimationFrame( gameMove ); 
+
+    }
 
     function gameMove() { 
         if ( keys.ArrowLeft ) { 
@@ -144,9 +149,11 @@
     }
 
     function getCSSValue( element, property ) { 
-        const valueString = getComputedStyle( element ).getPropertyValue( property ), 
-            value = parseInt( valueString ); 
-        return value; 
+        const valueString = getComputedStyle( element ).getPropertyValue( property );
+        if ( valueString === 'auto' ) { 
+            return 'auto';
+        }
+        return parseInt( valueString ); 
     }
 
     function onKeyUp( e ) { 
