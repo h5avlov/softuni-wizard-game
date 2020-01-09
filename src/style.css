@@ -53,6 +53,17 @@ body, .game, .game-play, .game-score {
     overflow: hidden; 
 }
 
+.wizard-firing { 
+    background-image: url( './images/wizard-fire.png' );
+}
+
+.fire-ball { 
+    width: 40px; height: 40px; 
+    position: absolute; 
+    background-image: url( './images/fire-ball.png' ); 
+
+}
+
 /* Class to give to an element to remove it from the screen */
 .hidden { 
     display: none; 

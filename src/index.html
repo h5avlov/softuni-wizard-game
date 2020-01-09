@@ -42,15 +42,15 @@
     }; 
     const player = ( function() { 
         // Creating the main character 
-        const wizard = buildEntity( [ 'wizard' ] );  
+        const wizard = buildEntity( [ 'wizard' ] ); 
         // Inserting the main character in the DOM
         insertEntity( wizard, gamePlay ); 
-        
+
+        // Inner fields, holding the element size and positon
         const width = wizard.offsetWidth, 
             height = wizard.offsetHeight, 
             gravityMultiplier = 1, 
             gravity = gravityMultiplier * game.gravity; 
-
         let left = getCSSValue( wizard, 'left' ), 
             bottom = getCSSValue( wizard, 'bottom' ); 
 
@@ -61,7 +61,6 @@
             bottom = value; 
             changePosition( 'bottom', bottom ); 
         }
-
         function setLeft( value ) { 
             left = value; 
             changePosition( 'left', left );
@@ -69,14 +68,21 @@
 
 
         // Assigns new value to the corresponding property of the DOM element
-        function changePosition( position, value ) { 
-            wizard.style[ position ] = assignPixelValue( value );
+        // function changePosition( position, value ) { 
+        //     wizard.style[ position ] = assignPixelValue( value );
+        // }
+        
+        const changePosition = setPosition( wizard, 'px' ); 
+
+        function setPosition( element, units ) { 
+            return function( property, value ) { 
+                element.style[ property ] = value.toString() + units; 
+            }; 
         }
 
 
         // Functions to modify the value of a position property
         // and pass it to the DOM
-
         function moveLeft() { 
             if ( isAtLeftBorder() ) { 
                 return;
@@ -105,19 +111,15 @@
 
         // Inner functions for checking wether 
         // the element has reached the end of the screen
-
         function isAtLeftBorder() { 
             return left <= 0;
         } 
-
         function isAtTopBorder() {
             return bottom > game.areaHeight - height; 
         }
-
         function isAtRightBorder() {
             return left >= game.areaWidth - width - 10; 
         }
-
         function isAtBottomBorder() { 
             return bottom <= 0; 
         }
@@ -133,22 +135,43 @@
         }
 
 
+        function addFireball() { 
+            const fireball = buildEntity( [ 'fire-ball' ] ); 
+            insertEntity( fireball, gamePlay ); 
+            const setFireballPosition = setPosition( fireball, 'px' ); 
+            setFireballPosition( 'left', left + width ); 
+            setFireballPosition( 'bottom', bottom + height / 2 ); 
+
+        }
+
+        function openFire() { 
+            wizard.classList.add( 'wizard-firing' );
+        }
+
+        function closeFire() {
+            wizard.classList.remove( 'wizard-firing' );
+        }
+
+
         // Getters, calculating the values of the properties, non directly used for positioning
         function getTop() { 
             return game.areaHeight - bottom - height;
         }
-
         function getRight() { 
             return game.areaWidth - left - width; 
         }
 
 
+        // Exporting the player functions to control its position
         return {
             moveLeft, 
             moveUp, 
             moveRight, 
             moveDown, 
-            applyGravity 
+            applyGravity, 
+            openFire, 
+            closeFire, 
+            addFireball 
         }; 
     }() ); 
 
@@ -165,6 +188,7 @@
     function gameMove() { 
         player.applyGravity(); 
 
+        // Moving the main character
         if ( keys.ArrowLeft ) { 
             player.moveLeft(); 
         }
@@ -177,6 +201,14 @@
         if ( keys.ArrowDown ) { 
             player.moveDown();  
         } 
+
+        // Main character fires a ball 
+        if ( keys.Space ) { 
+            player.openFire(); 
+            player.addFireball();  
+        } else { 
+            player.closeFire(); 
+        }
 
         requestAnimationFrame( gameMove ); 
     }
