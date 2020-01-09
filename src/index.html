@@ -47,12 +47,6 @@
     }
 
     const keys = {};
-    const player = { 
-        width: wizard.offsetWidth, 
-        height: wizard.offsetHeight, 
-        left: getCSSValue( wizard, 'left' ), 
-        bottom: getCSSValue( wizard, 'bottom' ) 
-    }; 
     const game = { 
         areaWidth: gamePlay.offsetWidth, 
         areaHeight: gamePlay.offsetHeight, 
@@ -62,31 +56,91 @@
             return this.baseSpeed * this.multiplier; 
         }
     }; 
+    const player = ( function( wizard ) { 
+        let left = getCSSValue( wizard, 'left' ), 
+            top = getCSSValue( wizard, 'top' ), 
+            right = getCSSValue( wizard, 'right' ),
+            bottom = getCSSValue( wizard, 'bottom' );
+
+        function moveLeft() { 
+            if ( isAtLeftBorder() ) {
+                return;
+            }
+            left -= game.speed(); 
+            right += game.speed(); 
+            wizard.style.left = assignPixelValue( left ); 
+        }
+        function moveTop() { 
+            if ( isAtTopBorder() ) {
+                return;
+            }
+            top -= game.speed(); 
+            bottom += game.speed(); 
+            wizard.style.top = assignPixelValue( top );
+        }
+        function moveRight() { 
+            if ( isAtRightBorder() ) {
+                return;
+            }
+            right -= game.speed(); 
+            left += game.speed(); 
+            wizard.style.left = 'auto'; 
+            wizard.style.right = assignPixelValue( right );
+        }
+        function moveBottom() { 
+            if ( isAtBottomBorder() ) {
+                return;
+            }
+            bottom -= game.speed(); 
+            top += game.speed(); 
+            wizard.style.top = 'auto'; 
+            wizard.style.bottom = assignPixelValue( bottom ); 
+        }
+
+        function isAtLeftBorder() { 
+            return left <= 0;
+        } 
+
+        function isAtTopBorder() {
+            return top <= 0;
+        }
+
+        function isAtRightBorder() {
+            return right <= 0;
+        }
+
+        function isAtBottomBorder() { 
+            return bottom <= 0;
+        }
+
+        return {
+            moveLeft, 
+            moveTop, 
+            moveRight, 
+            moveBottom
+        }; 
+    }( wizard ) ); 
+
 
     function gameMove() { 
-        const isAtTopBorder = player.bottom >= game.areaHeight - player.height, 
-            isAtRightBorder = player.left >= game.areaWidth - player.width, 
-            isAtLeftBorder = player.left <= 0, 
-            isAtBottomBorder = player.bottom <= 0;
-
-        if ( keys.ArrowLeft && !isAtLeftBorder ) { 
-            player.left -= game.speed(); 
+        if ( keys.ArrowLeft ) { 
+            player.moveLeft(); 
         }
-        if ( keys.ArrowUp && !isAtTopBorder ) { 
-            console.log( game.areaHeight );
-            player.bottom += game.speed(); 
+        if ( keys.ArrowUp ) { 
+            player.moveTop(); 
         }
-        if ( keys.ArrowRight && !isAtRightBorder ) { 
-            player.left += game.speed(); 
+        if ( keys.ArrowRight ) { 
+            player.moveRight(); 
         }
-        if ( keys.ArrowDown && !isAtBottomBorder ) { 
-            player.bottom -= game.speed(); 
+        if ( keys.ArrowDown ) { 
+            player.moveBottom();  
         }
-
-        wizard.style.left = player.left + 'px'; 
-        wizard.style.bottom = player.bottom + 'px'; 
 
         requestAnimationFrame( gameMove ); 
+    }
+
+    function assignPixelValue( value ) { 
+        return value + 'px';
     }
 
     function getCSSValue( element, property ) { 
