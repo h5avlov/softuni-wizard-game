@@ -50,38 +50,61 @@
             height = wizard.offsetHeight, 
             gravityMultiplier = 1, 
             gravity = gravityMultiplier * game.gravity; 
+
         let left = getCSSValue( wizard, 'left' ), 
             bottom = getCSSValue( wizard, 'bottom' ); 
+
+
+        // A change in the value of the property in this object
+        // is reflected with change in the value of the property in the DOM
+        function setBottom( value ) { 
+            bottom = value; 
+            changePosition( 'bottom', bottom ); 
+        }
+
+        function setLeft( value ) { 
+            left = value; 
+            changePosition( 'left', left );
+        }
+
+
+        // Assigns new value to the corresponding property of the DOM element
+        function changePosition( position, value ) { 
+            wizard.style[ position ] = assignPixelValue( value );
+        }
+
+
+        // Functions to modify the value of a position property
+        // and pass it to the DOM
 
         function moveLeft() { 
             if ( isAtLeftBorder() ) { 
                 return;
             } 
-            left -= game.speed(); 
-            wizard.style.left = assignPixelValue( left );
+            setLeft( left - Math.min( left, game.speed() ) );
         }
-        function moveTop() { 
+        function moveUp() { 
             if ( isAtTopBorder() ) {
                 return;
             }
-            bottom += Math.min( getTop(), game.speed() ); 
-            wizard.style.bottom = assignPixelValue( bottom );
+            setBottom( bottom + Math.min( getTop(), game.speed() ) ); 
         }
         function moveRight() { 
             if ( isAtRightBorder() ) {
                 return;
             }
-            
-            left += Math.min( getRight(), game.speed() ); 
-            wizard.style.left = assignPixelValue( left );
+            setLeft( left + Math.min( getRight(), game.speed() ) );
         }
-        function moveBottom() { 
+        function moveDown() { 
             if ( isAtBottomBorder() ) {
                 return;
             }
-            bottom -= game.speed(); 
-            wizard.style.bottom = assignPixelValue( bottom ); 
+            setBottom( bottom - Math.min( bottom, game.speed() ) ); 
         }
+
+
+        // Inner functions for checking wether 
+        // the element has reached the end of the screen
 
         function isAtLeftBorder() { 
             return left <= 0;
@@ -99,6 +122,8 @@
             return bottom <= 0; 
         }
 
+
+        // Function that simulates the effect of gravity on the character
         function applyGravity() { 
             if ( isAtBottomBorder() ) { 
                 return;
@@ -107,6 +132,8 @@
             wizard.style.bottom = assignPixelValue( bottom ); 
         }
 
+
+        // Getters, calculating the values of the properties, non directly used for positioning
         function getTop() { 
             return game.areaHeight - bottom - height;
         }
@@ -115,16 +142,12 @@
             return game.areaWidth - left - width; 
         }
 
-        function setPosition() {
-            wizard.style.left = assignPixelValue( left );
-            wizard.style.bottom = assignPixelValue( bottom ); 
-        }
 
         return {
             moveLeft, 
-            moveTop, 
+            moveUp, 
             moveRight, 
-            moveBottom, 
+            moveDown, 
             applyGravity 
         }; 
     }( wizard ) ); 
@@ -146,13 +169,13 @@
             player.moveLeft(); 
         }
         if ( keys.ArrowUp ) { 
-            player.moveTop(); 
+            player.moveUp(); 
         }
         if ( keys.ArrowRight ) { 
             player.moveRight(); 
         }
         if ( keys.ArrowDown ) { 
-            player.moveBottom();  
+            player.moveDown();  
         } 
 
         requestAnimationFrame( gameMove ); 
