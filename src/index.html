@@ -60,7 +60,7 @@
         //     bottom = getCSSValue( wizard, 'bottom' ); 
 
 
-        const setPosition = setPosProduce( position )( wizard, 'px' ); 
+        const setPosition = setPosProduce( 'px' )( position, wizard ); 
 
 
         // A change in the value of the property in this object
@@ -186,57 +186,51 @@
         }; 
     }() ); 
 
-    // const fireballs = ( function() {
-    //     const fireballs = []; 
-    //     const step = 8; 
+    const fireballs = ( function() {
+        const fireballs = []; 
+        const step = 8; 
 
-    //     const setFireballPosition = setPosProduce();
+        function createFireball( left, bottom ) {
+            const fireball = { 
+                element: buildEntity( [ 'fire-ball' ] ), 
+                left: left, 
+                bottom: bottom 
+            }; 
+            
+            fireballs.push( fireball ); 
+            insertEntity( fireball.element, gamePlay );
+        }
 
-    //     function createFireball( left, bottom ) {
-    //         const fireball = { 
-    //             element: buildEntity( [ 'fire-ball' ] ), 
-    //             left: left, 
-    //             bottom: bottom 
-    //         }; 
-    //         setFireballPosition( fireball.element, { left: fireball.left, bottom: fireball.bottom } ); 
-    //         fireballs.push( fireball ); 
-    //         insertEntity( fireball.element, gamePlay );
-    //     }
+        function moveFireballs() { 
+            for ( const fireball of fireballs ) {
+                if ( !isInPlayArea( fireball ) ) { 
+                    removeFireball( fireball ); 
+                    return; 
+                }
+                moveFireball( fireball ); 
+            }
+        }
 
-    //     function setLeft() {
+        function moveFireball( fireball ) { 
+            fireball.left += step;
+            setFireballPosition( fireball.element, { left: fireball.left } ); 
+        }
 
-    //     }
-
-    //     function moveFireballs() { 
-    //         for ( const fireball of fireballs ) {
-    //             if ( !isInPlayArea( fireball ) ) { 
-    //                 removeFireball( fireball ); 
-    //                 return; 
-    //             }
-    //             moveFireball( fireball ); 
-    //         }
-    //     }
-
-    //     function moveFireball( fireball ) { 
-    //         fireball.left += step;
-    //         setFireballPosition( fireball.element, { left: fireball.left } ); 
-    //     }
-
-    //     function removeFireball( fireball ) { 
-    //         fireball.element.parent.removeChild( fireball.element );
-    //     } 
+        function removeFireball( fireball ) { 
+            fireball.element.parent.removeChild( fireball.element );
+        } 
 
 
-    //     function isInPlayArea( fireball) { 
-    //         return true; 
-    //     }
+        function isInPlayArea( fireball) { 
+            return true; 
+        }
 
-    //     return { 
-    //         createFireball, 
-    //         moveFireballs
-    //     }; 
+        return { 
+            createFireball, 
+            moveFireballs
+        }; 
 
-    // }() );
+    }() );
 
     // Starts the gameplay
     function start() { 
@@ -279,8 +273,8 @@
     }
 
 
-    function setPosProduce( o ) { 
-        return function( element, units ) { 
+    function setPosProduce( units ) { 
+        return function( o, element ) { 
             return function( position ) { 
                 for ( const prop of Object.keys( position ) ) { 
                     o[ prop ] = position[ prop ]; 
