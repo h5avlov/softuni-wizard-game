@@ -68,10 +68,6 @@
 
 
         // Assigns new value to the corresponding property of the DOM element
-        // function changePosition( position, value ) { 
-        //     wizard.style[ position ] = assignPixelValue( value );
-        // }
-        
         const changePosition = setPosition( wizard, 'px' ); 
 
         function setPosition( element, units ) { 
@@ -135,15 +131,6 @@
         }
 
 
-        function addFireball() { 
-            const fireball = buildEntity( [ 'fire-ball' ] ); 
-            insertEntity( fireball, gamePlay ); 
-            const setFireballPosition = setPosition( fireball, 'px' ); 
-            setFireballPosition( 'left', left + width ); 
-            setFireballPosition( 'bottom', bottom + height / 2 ); 
-
-        }
-
         function openFire() { 
             wizard.classList.add( 'wizard-firing' );
         }
@@ -153,7 +140,16 @@
         }
 
 
-        // Getters, calculating the values of the properties, non directly used for positioning
+        // Getters for the directly used for positioning properties
+        function getLeft() { 
+            return left; 
+        }
+        function getBottom() { 
+            return bottom; 
+        }
+
+
+        // Getters, calculating the values of the properties, not directly used for positioning
         function getTop() { 
             return game.areaHeight - bottom - height;
         }
@@ -163,17 +159,67 @@
 
 
         // Exporting the player functions to control its position
-        return {
+        return { 
+            getLeft, 
+            getBottom, 
             moveLeft, 
             moveUp, 
             moveRight, 
             moveDown, 
             applyGravity, 
             openFire, 
-            closeFire, 
-            addFireball 
+            closeFire
         }; 
     }() ); 
+
+    const fireballs = ( function() {
+        const fireballs = []; 
+        const step = 8; 
+
+        function createFireball( left, bottom ) {
+            const fireball = { 
+                element: buildEntity( [ 'fire-ball' ] ), 
+                left: left, 
+                bottom: bottom 
+            }; 
+            fireball.element.style.left = left + 'px';
+            fireball.element.style.bottom = bottom + 'px'; 
+
+            fireballs.push( fireball ); 
+
+            insertEntity( fireball.element, gamePlay );
+        }
+
+        function moveFireballs() { 
+            for ( const fireball of fireballs ) {
+                if ( !isInPlayArea( fireball ) ) { 
+                    removeFireball( fireball ); 
+                    return; 
+                }
+                moveFireball( fireball ); 
+            }
+        }
+
+        function moveFireball( fireball ) { 
+            fireball.left += step;
+            fireball.element.style.left = fireball.left + 'px';
+            console.log( fireball.left ); 
+        }
+
+        function removeFireball( fireball ) { 
+            fireball.element.parent.removeChild( fireball.element );
+        } 
+
+        function isInPlayArea( fireball) { 
+            return true; 
+        }
+
+        return { 
+            createFireball, 
+            moveFireballs
+        }; 
+
+    }() );
 
     // Starts the gameplay
     function start() { 
@@ -204,11 +250,13 @@
 
         // Main character fires a ball 
         if ( keys.Space ) { 
-            player.openFire(); 
-            player.addFireball();  
+            player.openFire();  
+            fireballs.createFireball( player.getLeft() + 82, player.getBottom() ); 
         } else { 
             player.closeFire(); 
-        }
+        } 
+
+        fireballs.moveFireballs(); 
 
         requestAnimationFrame( gameMove ); 
     }
