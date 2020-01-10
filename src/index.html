@@ -51,24 +51,32 @@
             height = wizard.offsetHeight, 
             gravityMultiplier = 1, 
             gravity = gravityMultiplier * game.gravity; 
-        let left = getCSSValue( wizard, 'left' ), 
-            bottom = getCSSValue( wizard, 'bottom' ); 
+        const position = {
+            left: getCSSValue( wizard, 'left' ), 
+            bottom: getCSSValue( wizard, 'bottom' ) 
+        };
+
+        // let left = getCSSValue( wizard, 'left' ), 
+        //     bottom = getCSSValue( wizard, 'bottom' ); 
+
+
+        const setPosition = setPosProduce( position, wizard, 'px' ); 
 
 
         // A change in the value of the property in this object
         // is reflected with change in the value of the property in the DOM
-        function setBottom( value ) { 
-            bottom = value; 
-            changePosition( wizard, { 'bottom': bottom } ); 
-        }
-        function setLeft( value ) { 
-            left = value; 
-            changePosition( wizard, { 'left': left } ); 
-        }
+        // function setBottom( value ) { 
+        //     bottom = value; 
+        //     changePosition( wizard, { 'bottom': bottom } ); 
+        // }
+        // function setLeft( value ) { 
+        //     left = value; 
+        //     changePosition( wizard, { 'left': left } ); 
+        // }
 
 
         // Assigns new value to the corresponding property of the DOM element
-        const changePosition = setPosition( 'px' ); 
+        // const changePosition = setPosition( 'px' ); 
 
 
         // Functions to modify the value of a position property
@@ -77,41 +85,53 @@
             if ( isAtLeftBorder() ) { 
                 return;
             } 
-            setLeft( left - Math.min( left, game.speed() ) );
+            const value = position.left - Math.min( position.left, game.speed() ); 
+            setPosition( { 'left': value } );
+
+            // setLeft( left - Math.min( left, game.speed() ) );
         }
         function moveUp() { 
             if ( isAtTopBorder() ) {
                 return;
             }
-            setBottom( bottom + Math.min( getTop(), game.speed() ) ); 
+            const value = position.bottom + Math.min( getTop(), game.speed() ); 
+            setPosition( { 'bottom': value } );
+
+            // setBottom( bottom + Math.min( getTop(), game.speed() ) ); 
         }
         function moveRight() { 
             if ( isAtRightBorder() ) {
                 return;
             }
-            setLeft( left + Math.min( getRight(), game.speed() ) );
+            const value = position.left + Math.min( getRight(), game.speed() ); 
+            setPosition( { 'left': value } );
+
+            // setLeft( left + Math.min( getRight(), game.speed() ) );
         }
         function moveDown() { 
             if ( isAtBottomBorder() ) {
                 return;
             }
-            setBottom( bottom - Math.min( bottom, game.speed() ) ); 
+            const value = position.bottom - Math.min( position.bottom, game.speed() ); 
+            setPosition( { 'bottom': value } ); 
+
+            // setBottom( bottom - Math.min( bottom, game.speed() ) ); 
         }
 
 
         // Inner functions for checking wether 
         // the element has reached the end of the screen
         function isAtLeftBorder() { 
-            return left <= 0;
+            return position.left <= 0;
         } 
         function isAtTopBorder() {
-            return bottom > game.areaHeight - height; 
+            return position.bottom > game.areaHeight - height; 
         }
         function isAtRightBorder() {
-            return left >= game.areaWidth - width - 10; 
+            return position.left >= game.areaWidth - width - 10; 
         }
         function isAtBottomBorder() { 
-            return bottom <= 0; 
+            return position.bottom <= 0; 
         }
 
 
@@ -120,8 +140,8 @@
             if ( isAtBottomBorder() ) { 
                 return;
             }
-            bottom -= gravity; 
-            wizard.style.bottom = assignPixelValue( bottom ); 
+            position.bottom -= gravity; 
+            wizard.style.bottom = assignPixelValue( position.bottom ); 
         }
 
 
@@ -136,19 +156,19 @@
 
         // Getters for the directly used for positioning properties
         function getLeft() { 
-            return left; 
+            return position.left; 
         }
         function getBottom() { 
-            return bottom; 
+            return position.bottom; 
         }
 
 
         // Getters, calculating the values of the properties, not directly used for positioning
         function getTop() { 
-            return game.areaHeight - bottom - height;
+            return game.areaHeight - position.bottom - height;
         }
         function getRight() { 
-            return game.areaWidth - left - width; 
+            return game.areaWidth - position.left - width; 
         }
 
 
@@ -166,55 +186,57 @@
         }; 
     }() ); 
 
-    const fireballs = ( function() {
-        const fireballs = []; 
-        const step = 8; 
+    // const fireballs = ( function() {
+    //     const fireballs = []; 
+    //     const step = 8; 
 
-        const setFireballPosition = setPosition( 'px' );
+    //     const setFireballPosition = setPosition( 'px' );
 
-        function createFireball( left, bottom ) {
-            const fireball = { 
-                element: buildEntity( [ 'fire-ball' ] ), 
-                left: left, 
-                bottom: bottom 
-            }; 
-            setFireballPosition( fireball.element, { left: fireball.left, bottom: fireball.bottom } ); 
+    //     function createFireball( left, bottom ) {
+    //         const fireball = { 
+    //             element: buildEntity( [ 'fire-ball' ] ), 
+    //             left: left, 
+    //             bottom: bottom 
+    //         }; 
+    //         setFireballPosition( fireball.element, { left: fireball.left, bottom: fireball.bottom } ); 
+    //         fireballs.push( fireball ); 
+    //         insertEntity( fireball.element, gamePlay );
+    //     }
 
-            fireballs.push( fireball ); 
+    //     function setLeft() {
 
-            insertEntity( fireball.element, gamePlay );
-        }
+    //     }
 
-        function moveFireballs() { 
-            for ( const fireball of fireballs ) {
-                if ( !isInPlayArea( fireball ) ) { 
-                    removeFireball( fireball ); 
-                    return; 
-                }
-                moveFireball( fireball ); 
-            }
-        }
+    //     function moveFireballs() { 
+    //         for ( const fireball of fireballs ) {
+    //             if ( !isInPlayArea( fireball ) ) { 
+    //                 removeFireball( fireball ); 
+    //                 return; 
+    //             }
+    //             moveFireball( fireball ); 
+    //         }
+    //     }
 
-        function moveFireball( fireball ) { 
-            fireball.left += step;
-            fireball.element.style.left = fireball.left + 'px';
-            console.log( fireball.left ); 
-        }
+    //     function moveFireball( fireball ) { 
+    //         fireball.left += step;
+    //         setFireballPosition( fireball.element, { left: fireball.left } ); 
+    //     }
 
-        function removeFireball( fireball ) { 
-            fireball.element.parent.removeChild( fireball.element );
-        } 
+    //     function removeFireball( fireball ) { 
+    //         fireball.element.parent.removeChild( fireball.element );
+    //     } 
 
-        function isInPlayArea( fireball) { 
-            return true; 
-        }
 
-        return { 
-            createFireball, 
-            moveFireballs
-        }; 
+    //     function isInPlayArea( fireball) { 
+    //         return true; 
+    //     }
 
-    }() );
+    //     return { 
+    //         createFireball, 
+    //         moveFireballs
+    //     }; 
+
+    // }() );
 
     // Starts the gameplay
     function start() { 
@@ -244,26 +266,51 @@
         } 
 
         // Main character fires a ball 
-        if ( keys.Space ) { 
-            player.openFire();  
-            fireballs.createFireball( player.getLeft() + 82, player.getBottom() ); 
-        } else { 
-            player.closeFire(); 
-        } 
+        // if ( keys.Space ) { 
+        //     player.openFire();  
+        //     fireballs.createFireball( player.getLeft() + 82, player.getBottom() ); 
+        // } else { 
+        //     player.closeFire(); 
+        // } 
 
-        fireballs.moveFireballs(); 
+        // fireballs.moveFireballs(); 
 
         requestAnimationFrame( gameMove ); 
     }
 
 
-    function setPosition( units ) { 
-        return function( element, position ) { 
-            for ( const property of Object.keys( position ) ) { 
-                element.style[ property ] = position[ property ] + units; 
+    function setPosProduce( o, element, units ) { 
+        return function( position ) { 
+            for ( const prop of Object.keys( position ) ) { 
+                o[ prop ] = position[ prop ]; 
+                element.style[ prop ] = position[ prop ] + units; 
             }
-        }; 
+        }
     }
+
+
+    // function setPosProduce( o ) { 
+    //     return function( position ) { 
+    //         for ( const prop of Object.keys( position ) ) { 
+    //             o[ prop ] = position[ prop ]; 
+    //             setPosDOM( prop, position[ prop ] ); 
+    //         }
+    //     }
+    // }
+
+    // function setPosDOMProduce( element, units ) { 
+    //     return function( prop, value ) { 
+    //         element.style[ prop ] = value + units; 
+    //     }
+    // }
+
+    // function setPosition( units ) { 
+    //     return function( element, position ) { 
+    //         for ( const property of Object.keys( position ) ) { 
+    //             element.style[ property ] = position[ property ] + units; 
+    //         }
+    //     }; 
+    // }
 
     // function setPosition( element, units ) { 
     //     return function( args ) { 
