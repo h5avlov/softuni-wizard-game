@@ -59,22 +59,16 @@
         // is reflected with change in the value of the property in the DOM
         function setBottom( value ) { 
             bottom = value; 
-            changePosition( 'bottom', bottom ); 
+            changePosition( wizard, { 'bottom': bottom } ); 
         }
         function setLeft( value ) { 
             left = value; 
-            changePosition( 'left', left );
+            changePosition( wizard, { 'left': left } ); 
         }
 
 
         // Assigns new value to the corresponding property of the DOM element
-        const changePosition = setPosition( wizard, 'px' ); 
-
-        function setPosition( element, units ) { 
-            return function( property, value ) { 
-                element.style[ property ] = value.toString() + units; 
-            }; 
-        }
+        const changePosition = setPosition( 'px' ); 
 
 
         // Functions to modify the value of a position property
@@ -176,14 +170,15 @@
         const fireballs = []; 
         const step = 8; 
 
+        const setFireballPosition = setPosition( 'px' );
+
         function createFireball( left, bottom ) {
             const fireball = { 
                 element: buildEntity( [ 'fire-ball' ] ), 
                 left: left, 
                 bottom: bottom 
             }; 
-            fireball.element.style.left = left + 'px';
-            fireball.element.style.bottom = bottom + 'px'; 
+            setFireballPosition( fireball.element, { left: fireball.left, bottom: fireball.bottom } ); 
 
             fireballs.push( fireball ); 
 
@@ -260,6 +255,29 @@
 
         requestAnimationFrame( gameMove ); 
     }
+
+
+    function setPosition( units ) { 
+        return function( element, position ) { 
+            for ( const property of Object.keys( position ) ) { 
+                element.style[ property ] = position[ property ] + units; 
+            }
+        }; 
+    }
+
+    // function setPosition( element, units ) { 
+    //     return function( args ) { 
+    //         for ( const property of Object.keys( args ) ) { 
+    //             element.style[ property ] = args[ property ] + units; 
+    //         }
+    //     }; 
+    // }
+
+    // function setPosition( element, units ) { 
+    //     return function( property, value ) { 
+    //         element.style[ property ] = value.toString() + units; 
+    //     }; 
+    // }
 
     function assignPixelValue( value ) { 
         return value + 'px';
