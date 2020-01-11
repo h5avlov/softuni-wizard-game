@@ -33,10 +33,12 @@
     const game = { 
         areaWidth: gamePlay.offsetWidth, 
         areaHeight: gamePlay.offsetHeight, 
-        speed: 2, 
+        speed: 1, 
         wizardSpeedMultiplier: 5, 
-        fireballSpeedMutiplier: 3, 
-        cloudSpeedMultiplier: 2, 
+        fireballSpeedMutiplier: 8, 
+        cloudSpeedMultiplier: 1, 
+        cloudsDistanceMin: 20, 
+        cloudsDistanceMax: 200, 
         gravity: 2, 
         wizardGravityMultiplier: 1 
         
@@ -189,7 +191,7 @@
 
     const fireballs = ( function() {
         let fireballs = []; 
-        const step = 8; 
+        const step = game.fireballSpeedMutiplier * game.speed; 
         const fireballsInterval = 1000; 
         let lastFireballTimestamp = -1;
 
@@ -256,20 +258,18 @@
 
     const clouds = ( function() {
         let clouds = [];
-        let lastCloudTimestamp = 0; 
-        const cloudCreationIntervalMin = 2000; 
-        const cloudCreationIntervalMax = 8000; 
-        let nextCloudTimestamp = 0; 
+        const cloudWidth = 200;
+        const cloudHeight = 200; 
+        let nextCloudDistance = 0; 
         const cloudTopOffset = 50; 
         const cloudBottomOffset = 250; 
-        const cloudRange = game.areaHeight - cloudTopOffset - cloudBottomOffset; 
-        const cloudSpeedMultiplier = 0.2; 
-        const step = cloudSpeedMultiplier * game.speed; 
+        const cloudRange = game.areaHeight - cloudTopOffset - cloudBottomOffset - cloudHeight; 
+        const step = game.cloudSpeedMultiplier * game.speed;    
 
         const setCloudPosition = setPosProduce( 'px' ); 
         
         function createCloud( timestamp ) { 
-            if ( !isCreateAllowed( timestamp ) ) {
+            if ( !isCreateAllowed() ) {
                 return;
             } 
 
@@ -278,16 +278,17 @@
                 left: 0, 
                 bottom: 0 
             }; 
-            const cloudBottomPosition = cloudBottomOffset + Math.random() * cloudRange - 200; 
+            const cloudBottomPosition = cloudBottomOffset + Math.random() * cloudRange; 
             setCloudPosition( cloud, cloud.element )( { 'left': game.areaWidth, 'bottom': cloudBottomPosition } ); 
             insertEntity( cloud.element, gamePlay ); 
 
             clouds.push( cloud ); 
 
-            nextCloudTimestamp = calcNextCloudTimeStamp( timestamp ); 
+            nextCloudDistance = game.cloudsDistanceMin + Math.random() * ( game.cloudsDistanceMax - game.cloudsDistanceMin ); 
         }
 
         function moveClouds() { 
+            removeOuterClouds(); 
             for ( const cloud of clouds ) { 
                 moveCloud( cloud ); 
             }
@@ -297,17 +298,39 @@
             setCloudPosition( cloud, cloud.element )( { 'left': cloud.left - step } ); 
         }
 
-        function removeCloud() {
+        function removeOuterClouds() { 
+            for ( const cloud of clouds ) { 
+                if ( !isInPlayArea( cloud ) ) { 
+                    removeCloud( cloud );
+                } 
+            }
+            clouds = clouds.filter( ( cloud ) => { return cloud.element !== null; } );
+        }
 
+        function removeCloud( cloud ) { 
+            cloud.element.parentElement.removeChild( cloud.element ); 
+            cloud.element = null; 
+        }
+
+        function isInPlayArea( cloud ) { 
+            return cloud.left >= -cloudWidth;  
         }
 
         function calcNextCloudTimeStamp( timestamp ) { 
             return timestamp + cloudCreationIntervalMin + Math.random() * ( cloudCreationIntervalMax - cloudCreationIntervalMin ); 
         }
 
-        function isCreateAllowed( timestamp ) {
-            return timestamp >= nextCloudTimestamp; 
+        function isCreateAllowed() {
+            if ( clouds.length === 0 ) { 
+                return true;
+            }
+            const lastCloudLeft = clouds[ clouds.length - 1 ].left;  
+            return lastCloudLeft <= game.areaWidth - cloudWidth - nextCloudDistance; 
         }
+
+        // function isCreateAllowed( timestamp ) {
+        //     return timestamp >= nextCloudTimestamp; 
+        // }
 
         return { 
             createCloud, 
