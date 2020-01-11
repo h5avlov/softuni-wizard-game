@@ -30,6 +30,7 @@
     document.addEventListener( 'keyup', onKeyUp ); 
 
     const keys = {};
+
     const game = { 
         areaWidth: gamePlay.offsetWidth, 
         areaHeight: gamePlay.offsetHeight, 
@@ -43,6 +44,7 @@
         wizardGravityMultiplier: 1 
         
     }; 
+
     const player = ( function() { 
         // Creating the main character 
         const wizard = buildEntity( [ 'wizard' ] ); 
@@ -268,7 +270,7 @@
 
         const setCloudPosition = setPosProduce( 'px' ); 
         
-        function createCloud( timestamp ) { 
+        function createCloud() { 
             if ( !isCreateAllowed() ) {
                 return;
             } 
@@ -288,7 +290,7 @@
         }
 
         function moveClouds() { 
-            removeOuterClouds(); 
+            removeOutOfScreenClouds(); 
             for ( const cloud of clouds ) { 
                 moveCloud( cloud ); 
             }
@@ -298,7 +300,7 @@
             setCloudPosition( cloud, cloud.element )( { 'left': cloud.left - step } ); 
         }
 
-        function removeOuterClouds() { 
+        function removeOutOfScreenClouds() { 
             for ( const cloud of clouds ) { 
                 if ( !isInPlayArea( cloud ) ) { 
                     removeCloud( cloud );
@@ -316,10 +318,6 @@
             return cloud.left >= -cloudWidth;  
         }
 
-        function calcNextCloudTimeStamp( timestamp ) { 
-            return timestamp + cloudCreationIntervalMin + Math.random() * ( cloudCreationIntervalMax - cloudCreationIntervalMin ); 
-        }
-
         function isCreateAllowed() {
             if ( clouds.length === 0 ) { 
                 return true;
@@ -328,9 +326,6 @@
             return lastCloudLeft <= game.areaWidth - cloudWidth - nextCloudDistance; 
         }
 
-        // function isCreateAllowed( timestamp ) {
-        //     return timestamp >= nextCloudTimestamp; 
-        // }
 
         return { 
             createCloud, 
@@ -350,10 +345,11 @@
     }
 
     function gameMove( timestamp ) { 
-        player.applyGravity(); 
 
-        clouds.createCloud( timestamp ); 
+        clouds.createCloud(); 
         clouds.moveClouds(); 
+
+        player.applyGravity(); 
 
         // Moving the main character
         if ( keys.ArrowLeft ) { 
