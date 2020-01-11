@@ -33,12 +33,13 @@
     const game = { 
         areaWidth: gamePlay.offsetWidth, 
         areaHeight: gamePlay.offsetHeight, 
-        baseSpeed: 5, 
-        multiplier: 1, 
-        gravity: 5, 
-        speed: function() { 
-            return this.baseSpeed * this.multiplier; 
-        }
+        speed: 2, 
+        wizardSpeedMultiplier: 5, 
+        fireballSpeedMutiplier: 3, 
+        cloudSpeedMultiplier: 2, 
+        gravity: 2, 
+        wizardGravityMultiplier: 1 
+        
     }; 
     const player = ( function() { 
         // Creating the main character 
@@ -49,8 +50,8 @@
         // Inner fields, holding the element size and positon
         const width = wizard.offsetWidth, 
             height = wizard.offsetHeight, 
-            gravityMultiplier = 1, 
-            gravity = gravityMultiplier * game.gravity; 
+            speed = game.wizardSpeedMultiplier * game.speed, 
+            gravity = game.wizardGravityMultiplier * game.gravity; 
         const position = {
             left: getCSSValue( wizard, 'left' ), 
             bottom: getCSSValue( wizard, 'bottom' ) 
@@ -85,7 +86,7 @@
             if ( isAtLeftBorder() ) { 
                 return;
             } 
-            const value = position.left - Math.min( position.left, game.speed() ); 
+            const value = position.left - Math.min( position.left, speed ); 
             setPosition( { 'left': value } );
 
             // setLeft( left - Math.min( left, game.speed() ) );
@@ -94,7 +95,7 @@
             if ( isAtTopBorder() ) {
                 return;
             }
-            const value = position.bottom + Math.min( getTop(), game.speed() ); 
+            const value = position.bottom + Math.min( getTop(), speed ); 
             setPosition( { 'bottom': value } );
 
             // setBottom( bottom + Math.min( getTop(), game.speed() ) ); 
@@ -103,7 +104,7 @@
             if ( isAtRightBorder() ) {
                 return;
             }
-            const value = position.left + Math.min( getRight(), game.speed() ); 
+            const value = position.left + Math.min( getRight(), speed ); 
             setPosition( { 'left': value } );
 
             // setLeft( left + Math.min( getRight(), game.speed() ) );
@@ -112,7 +113,7 @@
             if ( isAtBottomBorder() ) {
                 return;
             }
-            const value = position.bottom - Math.min( position.bottom, game.speed() ); 
+            const value = position.bottom - Math.min( position.bottom, speed ); 
             setPosition( { 'bottom': value } ); 
 
             // setBottom( bottom - Math.min( bottom, game.speed() ) ); 
@@ -263,7 +264,7 @@
         const cloudBottomOffset = 250; 
         const cloudRange = game.areaHeight - cloudTopOffset - cloudBottomOffset; 
         const cloudSpeedMultiplier = 0.2; 
-        const step = cloudSpeedMultiplier * game.speed(); 
+        const step = cloudSpeedMultiplier * game.speed; 
 
         const setCloudPosition = setPosProduce( 'px' ); 
         
@@ -342,7 +343,7 @@
             player.moveRight(); 
         }
         if ( keys.ArrowDown ) { 
-            player.moveDown();  
+            // player.moveDown();  
         } 
 
         // Main character fires a ball 
