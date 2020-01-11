@@ -414,6 +414,21 @@
 
     // }() );
 
+    const fireballs = entityGroup( { 
+        wrapper: gamePlay, 
+        size: { 
+            width: 60, 
+            height: 60
+        }, 
+        elementClassNames: [ 'fire-ball' ], 
+        topOffset: 0, 
+        bottomOffset: 0, 
+        nextElementDistanceMin: 200, 
+        nextElementDistanceMax: 200, 
+        moveMultiplier: 4, 
+        moveRight: true 
+    } );
+
     const clouds = entityGroup( {
         wrapper: gamePlay,
         size: { 
@@ -424,7 +439,7 @@
         topOffset: 20, 
         bottomOffset: 100, 
         nextElementDistanceMin: 40, 
-        nextElementDistanceMax: 180, 
+        nextElementDistanceMax: 120, 
         moveMultiplier: 1, 
         moveRight: false 
     } );
@@ -438,8 +453,8 @@
         elementClassNames: [ 'bug' ], 
         topOffset: 50, 
         bottomOffset: 50, 
-        nextElementDistanceMin: 50, 
-        nextElementDistanceMax: 150, 
+        nextElementDistanceMin: 200, 
+        nextElementDistanceMax: 450, 
         moveMultiplier: 3, 
         moveRight: false
     } );
@@ -474,12 +489,12 @@
             }
             const element = { 
                 node: buildEntity( elementClassNames ), 
-                position: {} 
+                position: {
+                    left: position.left || game.areaWidth, 
+                    bottom: position.bottom || randomElementBottom() 
+                } 
             }
-            setPosition( element.position, element.node )( {
-                left: args.Right ? -args.size.width : game.areaWidth, 
-                bottom: randomElementBottom()
-            } ); 
+            setPosition( element.position, element.node )( element.position ); 
             insertEntity( element.node, args.wrapper );
             elements.push( element );
 
@@ -582,18 +597,18 @@
             player.moveRight(); 
         }
         if ( keys.ArrowDown ) { 
-            // player.moveDown();  
+            player.moveDown();  
         } 
 
         // Main character fires a ball 
         if ( keys.Space ) { 
             player.openFire();  
-            // fireballs.createFireball( player.getLeft() + 82, player.getBottom() + 25, timestamp ); 
+            fireballs.create( { 'left': player.getLeft() + 82, 'bottom': player.getBottom() + 25 }, timestamp ); 
         } else { 
             player.closeFire(); 
         } 
 
-        // fireballs.moveFireballs(); 
+        fireballs.moveAll(); 
 
         requestAnimationFrame( gameMove ); 
     }
