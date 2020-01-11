@@ -33,7 +33,7 @@
     const game = { 
         areaWidth: gamePlay.offsetWidth, 
         areaHeight: gamePlay.offsetHeight, 
-        baseSpeed: 10, 
+        baseSpeed: 5, 
         multiplier: 1, 
         gravity: 5, 
         speed: function() { 
@@ -195,7 +195,7 @@
         const setFireballPosition = setPosProduce( 'px' );
 
         function createFireball( left, bottom, timestamp ) {
-            if ( !isCreateAllowed( timestamp ) ) { 
+            if ( !isFireballReady( timestamp ) ) { 
                 return;
             }
 
@@ -212,11 +212,12 @@
             lastFireballTimestamp = timestamp; 
         }
 
+        // Removes fireballs from the play area, when the end the sreen is reached, 
+        // and moves all fireballs, that are still in the scene
         function moveFireballs() { 
             for ( const fireball of fireballs ) { 
                 if ( !isInPlayArea( fireball ) ) { 
-                    removeFireball( fireball ); 
-                    fireball.element = null; 
+                    removeFireball( fireball );  
                 }
             }
 
@@ -233,21 +234,84 @@
 
         function removeFireball( fireball ) {
             fireball.element.parentNode.removeChild( fireball.element ); 
+            fireball.element = null; 
         } 
 
 
-        function isCreateAllowed( timestamp ) { 
-            return true; 
+        function isFireballReady( timestamp ) { 
+            return timestamp - lastFireballTimestamp > fireballsInterval; 
         }
 
         function isInPlayArea( fireball ) { 
-            return fireball.left < game.areaWidth; 
+            return fireball.left <= game.areaWidth; 
         }
 
         return { 
             createFireball, 
             moveFireballs
         }; 
+
+    }() );
+
+    const clouds = ( function() {
+        let clouds = [];
+        let lastCloudTimestamp = 0; 
+        const cloudCreationIntervalMin = 2000; 
+        const cloudCreationIntervalMax = 8000; 
+        let nextCloudTimestamp = 0; 
+        const cloudTopOffset = 50; 
+        const cloudBottomOffset = 250; 
+        const cloudRange = game.areaHeight - cloudTopOffset - cloudBottomOffset; 
+        const cloudSpeedMultiplier = 0.2; 
+        const step = cloudSpeedMultiplier * game.speed(); 
+
+        const setCloudPosition = setPosProduce( 'px' ); 
+        
+        function createCloud( timestamp ) { 
+            if ( !isCreateAllowed( timestamp ) ) {
+                return;
+            } 
+
+            const cloud = {
+                element: buildEntity( [ 'cloud' ] ), 
+                left: 0, 
+                bottom: 0 
+            }; 
+            const cloudBottomPosition = cloudBottomOffset + Math.random() * cloudRange - 200; 
+            setCloudPosition( cloud, cloud.element )( { 'left': game.areaWidth, 'bottom': cloudBottomPosition } ); 
+            insertEntity( cloud.element, gamePlay ); 
+
+            clouds.push( cloud ); 
+
+            nextCloudTimestamp = calcNextCloudTimeStamp( timestamp ); 
+        }
+
+        function moveClouds() { 
+            for ( const cloud of clouds ) { 
+                moveCloud( cloud ); 
+            }
+        }
+
+        function moveCloud( cloud ) { 
+            setCloudPosition( cloud, cloud.element )( { 'left': cloud.left - step } ); 
+        }
+
+        function removeCloud() {
+
+        }
+
+        function calcNextCloudTimeStamp( timestamp ) { 
+            return timestamp + cloudCreationIntervalMin + Math.random() * ( cloudCreationIntervalMax - cloudCreationIntervalMin ); 
+        }
+
+        function isCreateAllowed( timestamp ) {
+            return timestamp >= nextCloudTimestamp; 
+        }
+
+        return { 
+            createCloud, 
+            moveClouds
+        };
 
     }() );
 
@@ -263,6 +327,9 @@
 
     function gameMove( timestamp ) { 
         player.applyGravity(); 
+
+        clouds.createCloud( timestamp ); 
+        clouds.moveClouds(); 
 
         // Moving the main character
         if ( keys.ArrowLeft ) { 
@@ -281,7 +348,7 @@
         // Main character fires a ball 
         if ( keys.Space ) { 
             player.openFire();  
-            fireballs.createFireball( player.getLeft() + 82, player.getBottom(), timestamp ); 
+            fireballs.createFireball( player.getLeft() + 82, player.getBottom() + 25, timestamp ); 
         } else { 
             player.closeFire(); 
         } 

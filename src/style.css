@@ -65,6 +65,13 @@ body, .game, .game-play, .game-score {
 
 }
 
+.cloud { 
+    width: 200px; height: 200px; 
+    position: absolute; 
+    background-image: url( './images/cloud.png' ); 
+
+}
+
 /* Class to give to an element to remove it from the screen */
 .hidden { 
     display: none; 
