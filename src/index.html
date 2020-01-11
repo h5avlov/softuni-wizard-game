@@ -40,6 +40,11 @@
         cloudSpeedMultiplier: 1, 
         cloudsDistanceMin: 20, 
         cloudsDistanceMax: 200, 
+        bugsTopOffset: 50, 
+        bugsBottomOffset: 50, 
+        createBugIntervalMin: 1000, 
+        createBugIntervalMax: 2000, 
+        bugSpeedMultiplier: 2, 
         gravity: 2, 
         wizardGravityMultiplier: 1 
         
@@ -191,270 +196,355 @@
         }; 
     }() ); 
 
-    const fireballs = ( function() {
-        let fireballs = []; 
-        const step = game.fireballSpeedMutiplier * game.speed; 
-        const fireballsInterval = 1000; 
-        let lastFireballTimestamp = -1;
+    // const fireballs = ( function() {
+    //     let fireballs = []; 
+    //     const step = game.fireballSpeedMutiplier * game.speed; 
+    //     const fireballsInterval = 1000; 
+    //     let lastFireballTimestamp = -1;
 
-        const setFireballPosition = setPosProduce( 'px' );
+    //     const setFireballPosition = setPosProduce( 'px' );
 
-        function createFireball( left, bottom, timestamp ) {
-            if ( !isFireballReady( timestamp ) ) { 
-                return;
-            }
+    //     function createFireball( left, bottom, timestamp ) {
+    //         if ( !isFireballReady( timestamp ) ) { 
+    //             return;
+    //         }
 
-            const fireball = { 
-                element: buildEntity( [ 'fire-ball' ] ), 
-                left: 0, 
-                bottom: 0 
-            }; 
+    //         const fireball = { 
+    //             element: buildEntity( [ 'fire-ball' ] ), 
+    //             left: 0, 
+    //             bottom: 0 
+    //         }; 
 
-            setFireballPosition( fireball, fireball.element )( { 'left': left, 'bottom': bottom } ); 
-            insertEntity( fireball.element, gamePlay );
-            fireballs.push( fireball ); 
+    //         setFireballPosition( fireball, fireball.element )( { 'left': left, 'bottom': bottom } ); 
+    //         insertEntity( fireball.element, gamePlay );
+    //         fireballs.push( fireball ); 
 
-            lastFireballTimestamp = timestamp; 
-        }
+    //         lastFireballTimestamp = timestamp; 
+    //     }
 
-        // Removes fireballs from the play area, when the end the sreen is reached, 
-        // and moves all fireballs, that are still in the scene
-        function moveFireballs() { 
-            for ( const fireball of fireballs ) { 
-                if ( !isInPlayArea( fireball ) ) { 
-                    removeFireball( fireball );  
-                }
-            }
+    //     // Removes fireballs from the play area, when the end the sreen is reached, 
+    //     // and moves all fireballs, that are still in the scene
+    //     function moveFireballs() { 
+    //         for ( const fireball of fireballs ) { 
+    //             if ( !isInPlayArea( fireball ) ) { 
+    //                 removeFireball( fireball );  
+    //             }
+    //         }
 
-            fireballs = fireballs.filter( ( fireball ) => fireball.element !== null );
-            for ( const fireball of fireballs ) { 
-                moveFireball( fireball ); 
-            }
+    //         fireballs = fireballs.filter( ( fireball ) => fireball.element !== null );
+    //         for ( const fireball of fireballs ) { 
+    //             moveFireball( fireball ); 
+    //         }
             
-        }
+    //     }
 
-        function moveFireball( fireball ) { 
-            setFireballPosition( fireball, fireball.element )( { 'left': fireball.left + step } ); 
-        }
+    //     function moveFireball( fireball ) { 
+    //         setFireballPosition( fireball, fireball.element )( { 'left': fireball.left + step } ); 
+    //     }
 
-        function removeFireball( fireball ) {
-            fireball.element.parentNode.removeChild( fireball.element ); 
-            fireball.element = null; 
-        } 
+    //     function removeFireball( fireball ) {
+    //         fireball.element.parentNode.removeChild( fireball.element ); 
+    //         fireball.element = null; 
+    //     } 
 
 
-        function isFireballReady( timestamp ) { 
-            return timestamp - lastFireballTimestamp > fireballsInterval; 
-        }
+    //     function isFireballReady( timestamp ) { 
+    //         return timestamp - lastFireballTimestamp > fireballsInterval; 
+    //     }
 
-        function isInPlayArea( fireball ) { 
-            return fireball.left <= game.areaWidth; 
-        }
+    //     function isInPlayArea( fireball ) { 
+    //         return fireball.left <= game.areaWidth; 
+    //     }
 
-        return { 
-            createFireball, 
-            moveFireballs
-        }; 
+    //     return { 
+    //         createFireball, 
+    //         moveFireballs
+    //     }; 
 
-    }() );
+    // }() );
 
-    const clouds = ( function() {
-        let clouds = [];
-        const cloudWidth = 200;
-        const cloudHeight = 200; 
-        let nextCloudDistance = 0; 
-        const cloudTopOffset = 50; 
-        const cloudBottomOffset = 250; 
-        const cloudRange = game.areaHeight - cloudTopOffset - cloudBottomOffset - cloudHeight; 
-        const step = game.cloudSpeedMultiplier * game.speed;    
+    // const clouds = ( function() {
+    //     let clouds = [];
+    //     const cloudWidth = 200;
+    //     const cloudHeight = 200; 
+    //     let nextCloudDistance = 0; 
+    //     const cloudTopOffset = 50; 
+    //     const cloudBottomOffset = 250; 
+    //     const cloudRange = game.areaHeight - cloudTopOffset - cloudBottomOffset - cloudHeight; 
+    //     const step = game.cloudSpeedMultiplier * game.speed;    
 
-        const setCloudPosition = setPosProduce( 'px' ); 
+    //     const setCloudPosition = setPosProduce( 'px' ); 
         
-        function createCloud() { 
-            if ( !isCreateAllowed() ) {
-                return;
-            } 
+    //     function createCloud() { 
+    //         if ( !isCreateAllowed() ) {
+    //             return;
+    //         } 
 
-            const cloud = {
-                element: buildEntity( [ 'cloud' ] ), 
-                left: 0, 
-                bottom: 0 
-            }; 
-            const cloudBottomPosition = cloudBottomOffset + Math.random() * cloudRange; 
-            setCloudPosition( cloud, cloud.element )( { 'left': game.areaWidth, 'bottom': cloudBottomPosition } ); 
-            insertEntity( cloud.element, gamePlay ); 
+    //         const cloud = {
+    //             element: buildEntity( [ 'cloud' ] ), 
+    //             left: 0, 
+    //             bottom: 0 
+    //         }; 
+    //         const cloudBottomPosition = cloudBottomOffset + Math.random() * cloudRange; 
+    //         setCloudPosition( cloud, cloud.element )( { 'left': game.areaWidth, 'bottom': cloudBottomPosition } ); 
+    //         insertEntity( cloud.element, gamePlay ); 
 
-            clouds.push( cloud ); 
+    //         clouds.push( cloud ); 
 
-            nextCloudDistance = game.cloudsDistanceMin + Math.random() * ( game.cloudsDistanceMax - game.cloudsDistanceMin ); 
-        }
+    //         nextCloudDistance = game.cloudsDistanceMin + Math.random() * ( game.cloudsDistanceMax - game.cloudsDistanceMin ); 
+    //     }
 
-        function moveClouds() { 
-            removeOutOfScreenClouds(); 
-            for ( const cloud of clouds ) { 
-                moveCloud( cloud ); 
-            }
-        }
+    //     function moveClouds() { 
+    //         removeOutOfScreenClouds(); 
+    //         for ( const cloud of clouds ) { 
+    //             moveCloud( cloud ); 
+    //         }
+    //     }
 
-        function moveCloud( cloud ) { 
-            setCloudPosition( cloud, cloud.element )( { 'left': cloud.left - step } ); 
-        }
+    //     function moveCloud( cloud ) { 
+    //         setCloudPosition( cloud, cloud.element )( { 'left': cloud.left - step } ); 
+    //     }
 
-        function removeOutOfScreenClouds() { 
-            for ( const cloud of clouds ) { 
-                if ( !isInPlayArea( cloud ) ) { 
-                    removeCloud( cloud );
-                } 
-            }
-            clouds = clouds.filter( ( cloud ) => { return cloud.element !== null; } );
-        }
+    //     function removeOutOfScreenClouds() { 
+    //         for ( const cloud of clouds ) { 
+    //             if ( !isInPlayArea( cloud ) ) { 
+    //                 removeCloud( cloud );
+    //             } 
+    //         }
+    //         clouds = clouds.filter( ( cloud ) => { return cloud.element !== null; } );
+    //     }
 
-        function removeCloud( cloud ) { 
-            cloud.element.parentElement.removeChild( cloud.element ); 
-            cloud.element = null; 
-        }
+    //     function removeCloud( cloud ) { 
+    //         cloud.element.parentElement.removeChild( cloud.element ); 
+    //         cloud.element = null; 
+    //     }
 
-        function isInPlayArea( cloud ) { 
-            return cloud.left >= -cloudWidth;  
-        }
+    //     function isInPlayArea( cloud ) { 
+    //         return cloud.left >= -cloudWidth;  
+    //     }
 
-        function isCreateAllowed() {
-            if ( clouds.length === 0 ) { 
-                return true;
-            }
-            const lastCloudLeft = clouds[ clouds.length - 1 ].left;  
-            return lastCloudLeft <= game.areaWidth - cloudWidth - nextCloudDistance; 
-        }
-
-
-        return { 
-            createCloud, 
-            moveClouds
-        };
-
-    }() );
-
-    const bugs = ( function() {
-
-        let bugs = []; 
-
-        const setPosition = setPosProduce( 'px' );
-
-        function create( position ) {
-            if ( !isReadyToCreate() ) { 
-                return;
-            }
-            const bug = { 
-                node: buildEntity( [ 'bug' ] ),
-                left, 
-                bottom
-            }; 
-            setPosition( bug, bug.node )( position );
-            insertEntity( bug.node, gamePlay );
-            bugs.push( bug );
+    //     function isCreateAllowed() {
+    //         if ( clouds.length === 0 ) { 
+    //             return true;
+    //         }
+    //         const lastCloudLeft = clouds[ clouds.length - 1 ].left;  
+    //         return lastCloudLeft <= game.areaWidth - cloudWidth - nextCloudDistance; 
+    //     }
 
 
-        }
+    //     return { 
+    //         createCloud, 
+    //         moveClouds
+    //     };
 
-        function moveAll() {
+    // }() );
 
-        }
+    // const bugs = ( function() {
 
-        function remove() {
+    //     let bugs = []; 
+    //     const bugWidth = 60; 
+    //     const bugHeight = 60; 
+    //     let nextBugTimestamp = 0; 
+    //     const step = game.bugSpeedMultiplier * game.speed; 
 
-        }
+    //     const setPosition = setPosProduce( 'px' );
 
-        function removeExpired() {
+    //     function createBug( timestamp ) {
+    //         if ( !isReadyToCreate( timestamp ) ) {  
+    //             return;
+    //         }
+    //         const bug = { 
+    //             node: buildEntity( [ 'bug' ] ),
+    //             left: game.areaWidth, 
+    //             bottom: calcBugBottomPosition()
+    //         }; 
+    //         setPosition( bug, bug.node )( { 'left': bug.left, 'bottom': bug.bottom } ); 
+    //         insertEntity( bug.node, gamePlay );
+    //         bugs.push( bug );
 
-        }
+    //         nextBugTimestamp = calcNextBugTimestamp( timestamp ); 
+    //     }
 
-        function remove() {
+    //     function calcBugBottomPosition() { 
+    //         const bugsBottomPositionRange = game.areaHeight - game.bugsTopOffset - game.bugsBottomOffset - bugHeight; 
+    //         return game.bugsBottomOffset + Math.random() * bugsBottomPositionRange; 
+    //     }
 
-        }
+    //     function calcNextBugTimestamp( currentTimestamp ) { 
+    //         return currentTimestamp + game.createBugIntervalMin + Math.random() * ( game.createBugIntervalMax - game.createBugIntervalMin );
+    //     }
 
-        function isReadyToCreate() {
+    //     function moveAll() { 
+    //         for ( const bug of bugs ) { 
+    //             move( bug ); 
+    //         }
+    //         removeExpired();
+    //     }
 
-        }
+    //     function move( bug ) { 
+    //         setPosition( bug, bug.node )( { 'left': bug.left - step } ); 
+    //     }
 
-        function isInsideGameArea() {
+    //     function removeExpired() { 
+    //         for ( const bug of bugs ) { 
+    //             if ( !isInsideGameArea( bug ) ) {
+    //                 remove( bug ); 
+    //             }
+    //         }
+    //         bugs = bugs.filter( ( bug ) => { return bug.node !== null; } ); 
+    //     }
 
-        }
+    //     function remove( bug ) { 
+    //         bug.node.parentElement.removeChild( bug.node ); 
+    //         bug.node = null; 
+    //     }
 
-        return {
-            create,
-            move
-        };
+    //     function isReadyToCreate( currentTimestamp ) {
+    //        return currentTimestamp >= nextBugTimestamp; 
+    //     }
 
-    }() );
+    //     function isInsideGameArea( bug ) { 
+    //         return bug.left > - bugWidth; 
+    //     } 
+
+    //     return {
+    //         createBug,
+    //         moveAll
+    //     };
+
+    // }() );
+
+    const clouds = entityGroup( {
+        wrapper: gamePlay,
+        size: { 
+            width: 200, 
+            height: 200
+        }, 
+        elementClassNames: [ 'cloud' ], 
+        topOffset: 20, 
+        bottomOffset: 100, 
+        nextElementDistanceMin: 40, 
+        nextElementDistanceMax: 180, 
+        moveMultiplier: 1, 
+        moveRight: false 
+    } );
+
+    const bugs = entityGroup( { 
+        wrapper: gamePlay, 
+        size: { 
+            width: 60, 
+            height: 60
+        }, 
+        elementClassNames: [ 'bug' ], 
+        topOffset: 50, 
+        bottomOffset: 50, 
+        nextElementDistanceMin: 50, 
+        nextElementDistanceMax: 150, 
+        moveMultiplier: 3, 
+        moveRight: false
+    } );
 
     // Entity structure
     function entityGroup( {
         wrapper,
-        predicateToCreate, 
-        elementClassNames
-
+        size: { 
+            width, 
+            height
+        }, 
+        elementClassNames, 
+        topOffset, 
+        bottomOffset, 
+        nextElementDistanceMin, 
+        nextElementDistanceMax, 
+        moveMultiplier, 
+        moveRight
     } ) { 
 
         let elements = []; 
-        const args = arguments[ 0 ]; 
-
+        const args = entityGroup.arguments[ 0 ]; 
+        const moveStep = args.moveMultiplier * game.speed; 
+        let nextElementDistance = 0; 
 
         const setPosition = setPosProduce( 'px' ); 
 
 
-        function create( position ) { 
-            if ( !isReadyToCreate( predicateToCreate ) ) { 
+        function create( position, timestamp ) { 
+            if ( !isReadyToCreate( position ) ) { 
                 return;
             }
             const element = { 
                 node: buildEntity( elementClassNames ), 
-                position: {}
+                position: {} 
             }
-            setPosition( element, element.node )( position );
+            setPosition( element.position, element.node )( {
+                left: args.Right ? -args.size.width : game.areaWidth, 
+                bottom: randomElementBottom()
+            } ); 
             insertEntity( element.node, args.wrapper );
             elements.push( element );
 
+            nextElementDistance = calcNextElementDistance(); 
+        } 
 
+        function randomElementBottom() { 
+            const range = game.areaHeight - args.topOffset - args.bottomOffset - args.size.height;
+            return args.bottomOffset + Math.random() * range; 
+        }
+
+        function calcNextElementDistance() { 
+            const distanceRange = args.nextElementDistanceMax - args.nextElementDistanceMin;
+            const distance = args.nextElementDistanceMin + Math.random() * distanceRange; 
+            return distance; 
         }
 
         function moveAll() { 
             for ( const element of elements ) { 
                 move( element );
             }
+            removeExpired(); 
         }
 
-        function move( element ) {
-
+        function move( element ) { 
+            const nextPos = args.moveRight 
+                ? element.position.left + moveStep 
+                : element.position.left - moveStep; 
+            setPosition( element.position, element.node )( { 'left': nextPos } ); 
         }
 
         function removeExpired() { 
             for ( const element of elements ) {
-                removeFromDOM( element );
+                if ( !isInsideGameArea( { 'position': element.position, 'size': args.size } ) ) { 
+                    remove( element );
+                }
             }
-            removeFromElements(); 
-        }
-
-        function removeFromDOM( element ) { 
-            element.node.parentElement.removeChild( element.node ); 
-            element.node === null;
-        }
-
-        function removeFromCollection() {
             elements = elements.filter( ( element ) => { return element.node !== null } ); 
         }
 
-        function isReadyToCreate( predicate ) {  
-            return predicate(); 
+        function remove( element ) { 
+            element.node.parentElement.removeChild( element.node ); 
+            element.node = null; 
         }
 
-        function isInsideGameArea() {
+        function isReadyToCreate( position ) {  
+            if ( elements.length === 0 ) { 
+                return true; 
+            }
+            const lastElement = elements[ elements.length - 1 ];  
+            return args.moveRight
+                ? lastElement.position.left - position.left >= nextElementDistance 
+                : game.areaWidth - lastElement.position.left - args.size.width >= nextElementDistance; 
+        }
 
+        function isInsideGameArea( removeArgs ) {
+            return args.moveRight 
+                ? removeArgs.position.left <= game.areaWidth + removeArgs.size.width
+                : removeArgs.position.left >= - removeArgs.size.width;
         }
 
 
         return { 
             create, 
-            move
+            moveAll
         }; 
 
     }
@@ -471,8 +561,13 @@
 
     function gameMove( timestamp ) { 
 
-        clouds.createCloud(); 
-        clouds.moveClouds(); 
+        // player.create(); 
+
+        clouds.create( { 'left': game.areaWidth }, timestamp ); 
+        clouds.moveAll(); 
+
+        bugs.create( { 'left': game.areaWidth }, timestamp ); 
+        bugs.moveAll(); 
 
         player.applyGravity(); 
 
@@ -493,12 +588,12 @@
         // Main character fires a ball 
         if ( keys.Space ) { 
             player.openFire();  
-            fireballs.createFireball( player.getLeft() + 82, player.getBottom() + 25, timestamp ); 
+            // fireballs.createFireball( player.getLeft() + 82, player.getBottom() + 25, timestamp ); 
         } else { 
             player.closeFire(); 
         } 
 
-        fireballs.moveFireballs(); 
+        // fireballs.moveFireballs(); 
 
         requestAnimationFrame( gameMove ); 
     }
