@@ -187,42 +187,61 @@
     }() ); 
 
     const fireballs = ( function() {
-        const fireballs = []; 
+        let fireballs = []; 
         const step = 8; 
+        const fireballsInterval = 1000; 
+        let lastFireballTimestamp = -1;
 
-        function createFireball( left, bottom ) {
+        const setFireballPosition = setPosProduce( 'px' );
+
+        function createFireball( left, bottom, timestamp ) {
+            if ( !isCreateAllowed( timestamp ) ) { 
+                return;
+            }
+
             const fireball = { 
                 element: buildEntity( [ 'fire-ball' ] ), 
-                left: left, 
-                bottom: bottom 
+                left: 0, 
+                bottom: 0 
             }; 
-            
-            fireballs.push( fireball ); 
+
+            setFireballPosition( fireball, fireball.element )( { 'left': left, 'bottom': bottom } ); 
             insertEntity( fireball.element, gamePlay );
+            fireballs.push( fireball ); 
+
+            lastFireballTimestamp = timestamp; 
         }
 
         function moveFireballs() { 
-            for ( const fireball of fireballs ) {
+            for ( const fireball of fireballs ) { 
                 if ( !isInPlayArea( fireball ) ) { 
                     removeFireball( fireball ); 
-                    return; 
+                    fireball.element = null; 
                 }
+            }
+
+            fireballs = fireballs.filter( ( fireball ) => fireball.element !== null );
+            for ( const fireball of fireballs ) { 
                 moveFireball( fireball ); 
             }
+            
         }
 
         function moveFireball( fireball ) { 
-            fireball.left += step;
-            setFireballPosition( fireball.element, { left: fireball.left } ); 
+            setFireballPosition( fireball, fireball.element )( { 'left': fireball.left + step } ); 
         }
 
-        function removeFireball( fireball ) { 
-            fireball.element.parent.removeChild( fireball.element );
+        function removeFireball( fireball ) {
+            fireball.element.parentNode.removeChild( fireball.element ); 
         } 
 
 
-        function isInPlayArea( fireball) { 
+        function isCreateAllowed( timestamp ) { 
             return true; 
+        }
+
+        function isInPlayArea( fireball ) { 
+            return fireball.left < game.areaWidth; 
         }
 
         return { 
@@ -242,7 +261,7 @@
 
     }
 
-    function gameMove() { 
+    function gameMove( timestamp ) { 
         player.applyGravity(); 
 
         // Moving the main character
@@ -260,14 +279,14 @@
         } 
 
         // Main character fires a ball 
-        // if ( keys.Space ) { 
-        //     player.openFire();  
-        //     fireballs.createFireball( player.getLeft() + 82, player.getBottom() ); 
-        // } else { 
-        //     player.closeFire(); 
-        // } 
+        if ( keys.Space ) { 
+            player.openFire();  
+            fireballs.createFireball( player.getLeft() + 82, player.getBottom(), timestamp ); 
+        } else { 
+            player.closeFire(); 
+        } 
 
-        // fireballs.moveFireballs(); 
+        fireballs.moveFireballs(); 
 
         requestAnimationFrame( gameMove ); 
     }
