@@ -334,6 +334,131 @@
 
     }() );
 
+    const bugs = ( function() {
+
+        let bugs = []; 
+
+        const setPosition = setPosProduce( 'px' );
+
+        function create( position ) {
+            if ( !isReadyToCreate() ) { 
+                return;
+            }
+            const bug = { 
+                node: buildEntity( [ 'bug' ] ),
+                left, 
+                bottom
+            }; 
+            setPosition( bug, bug.node )( position );
+            insertEntity( bug.node, gamePlay );
+            bugs.push( bug );
+
+
+        }
+
+        function moveAll() {
+
+        }
+
+        function remove() {
+
+        }
+
+        function removeExpired() {
+
+        }
+
+        function remove() {
+
+        }
+
+        function isReadyToCreate() {
+
+        }
+
+        function isInsideGameArea() {
+
+        }
+
+        return {
+            create,
+            move
+        };
+
+    }() );
+
+    // Entity structure
+    function entityGroup( {
+        wrapper,
+        predicateToCreate, 
+        elementClassNames
+
+    } ) { 
+
+        let elements = []; 
+        const args = arguments[ 0 ]; 
+
+
+        const setPosition = setPosProduce( 'px' ); 
+
+
+        function create( position ) { 
+            if ( !isReadyToCreate( predicateToCreate ) ) { 
+                return;
+            }
+            const element = { 
+                node: buildEntity( elementClassNames ), 
+                position: {}
+            }
+            setPosition( element, element.node )( position );
+            insertEntity( element.node, args.wrapper );
+            elements.push( element );
+
+
+        }
+
+        function moveAll() { 
+            for ( const element of elements ) { 
+                move( element );
+            }
+        }
+
+        function move( element ) {
+
+        }
+
+        function removeExpired() { 
+            for ( const element of elements ) {
+                removeFromDOM( element );
+            }
+            removeFromElements(); 
+        }
+
+        function removeFromDOM( element ) { 
+            element.node.parentElement.removeChild( element.node ); 
+            element.node === null;
+        }
+
+        function removeFromCollection() {
+            elements = elements.filter( ( element ) => { return element.node !== null } ); 
+        }
+
+        function isReadyToCreate( predicate ) {  
+            return predicate(); 
+        }
+
+        function isInsideGameArea() {
+
+        }
+
+
+        return { 
+            create, 
+            move
+        }; 
+
+    }
+
     // Starts the gameplay
     function start() { 
         // Hiding the start button after click 
