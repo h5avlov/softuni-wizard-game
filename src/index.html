@@ -11,7 +11,7 @@
 <div class="game">
     <div class="game-start">Press To Play</div>
     <div class="game-play">
-        <div class="game-score">1200</div>
+        <div class="game-score">0</div>
     </div>
     <div class="game-over"></div>
 </div>
@@ -22,7 +22,7 @@
     const gameStart = getElement( ".game-start" ), 
         gamePlay = getElement( '.game-play' ), 
         gameOver = getElement( '.game-over' ), 
-        gameScore = getElement( '.score' ); 
+        gameScore = getElement( '.game-score' ); 
 
     // Game related events catching
     gameStart.addEventListener( 'click', start ); 
@@ -461,21 +461,34 @@
 
 
     const gameActions = ( function() { 
-        function detectCollision( fireballs, bugs ) { 
-            for ( const fireball of fireballs.getAll() ) { 
-                for ( const bug of bugs.getAll() ) { 
-                    if ( isCollisionDetected( fireball.node, bug.node ) ) {  
-                        fireballs.remove( fireball ); 
-                        bugs.remove( bug ); 
-                        return;
+
+        function detectCollision( entityGroupA, entityGroupB, actionOnCollision ) { 
+            let collisionHappened = false; 
+            for ( const entityA of entityGroupA ) { 
+                for ( const entityB of entityGroupB ) { 
+                    if ( isCollisionDetected( entityA, entityB ) ) { 
+                        actionOnCollision( entityA, entityB ); 
+                        return; 
                     }
                 }
             }
         }
 
+        // function detectCollision( fireballs, bugs ) { 
+        //     for ( const fireball of fireballs.getAll() ) { 
+        //         for ( const bug of bugs.getAll() ) { 
+        //             if ( isCollisionDetected( fireball, bug ) ) {  
+        //                 fireballs.remove( fireball ); 
+        //                 bugs.remove( bug ); 
+        //                 return;
+        //             }
+        //         }
+        //     }
+        // }
+
         function isCollisionDetected( entityA, entityB ) { 
-            const boundRectA = entityA.getBoundingClientRect(), 
-                boundRectB = entityB.getBoundingClientRect();
+            const boundRectA = entityA.node.getBoundingClientRect(), 
+                boundRectB = entityB.node.getBoundingClientRect();
             const isOutLeft = boundRectA.right <= boundRectB.left, 
                 isOutRight = boundRectA.left >= boundRectB.right, 
                 isOutTop = boundRectA.bottom <= boundRectB.top, 
@@ -647,7 +660,11 @@
 
         fireballs.moveAll(); 
 
-        gameActions.detectCollision( fireballs, bugs ); 
+        gameActions.detectCollision( fireballs.getAll(), bugs.getAll(), function( fireball, bug ) { 
+            fireballs.remove( fireball );
+            bugs.remove( bug ); 
+            gameScore.textContent = parseInt( gameScore.textContent ) + 100; 
+        } ); 
 
         requestAnimationFrame( gameMove ); 
     }
