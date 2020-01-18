@@ -66,27 +66,9 @@
             bottom: getCSSValue( wizard, 'bottom' ) 
         };
 
-        // let left = getCSSValue( wizard, 'left' ), 
-        //     bottom = getCSSValue( wizard, 'bottom' ); 
 
-
+        // Getting the function to change position
         const setPosition = setPosProduce( 'px' )( position, wizard ); 
-
-
-        // A change in the value of the property in this object
-        // is reflected with change in the value of the property in the DOM
-        // function setBottom( value ) { 
-        //     bottom = value; 
-        //     changePosition( wizard, { 'bottom': bottom } ); 
-        // }
-        // function setLeft( value ) { 
-        //     left = value; 
-        //     changePosition( wizard, { 'left': left } ); 
-        // }
-
-
-        // Assigns new value to the corresponding property of the DOM element
-        // const changePosition = setPosition( 'px' ); 
 
 
         // Functions to modify the value of a position property
@@ -97,8 +79,6 @@
             } 
             const value = position.left - Math.min( position.left, speed ); 
             setPosition( { 'left': value } );
-
-            // setLeft( left - Math.min( left, game.speed() ) );
         }
         function moveUp() { 
             if ( isAtTopBorder() ) {
@@ -106,8 +86,6 @@
             }
             const value = position.bottom + Math.min( getTop(), speed ); 
             setPosition( { 'bottom': value } );
-
-            // setBottom( bottom + Math.min( getTop(), game.speed() ) ); 
         }
         function moveRight() { 
             if ( isAtRightBorder() ) {
@@ -115,8 +93,6 @@
             }
             const value = position.left + Math.min( getRight(), speed ); 
             setPosition( { 'left': value } );
-
-            // setLeft( left + Math.min( getRight(), game.speed() ) );
         }
         function moveDown() { 
             if ( isAtBottomBorder() ) {
@@ -124,8 +100,6 @@
             }
             const value = position.bottom - Math.min( position.bottom, speed ); 
             setPosition( { 'bottom': value } ); 
-
-            // setBottom( bottom - Math.min( bottom, game.speed() ) ); 
         }
 
 
@@ -150,8 +124,7 @@
             if ( isAtBottomBorder() ) { 
                 return;
             }
-            position.bottom -= gravity; 
-            wizard.style.bottom = assignPixelValue( position.bottom ); 
+            setPosition( { bottom: position.bottom - gravity } ); 
         }
 
 
@@ -204,7 +177,7 @@
             getPlayer 
         }; 
     }() ); 
-    
+
 
     const fireballs = entityGroup( { 
         wrapper: gamePlay, 
@@ -253,7 +226,6 @@
 
 
     const gameActions = ( function() { 
-
         function detectCollision( entityGroupA, entityGroupB, actionOnCollision ) { 
             let collisionHappened = false; 
             for ( const entityA of entityGroupA ) { 
@@ -278,7 +250,6 @@
 
         return { 
             detectCollision
-
         };
 
     }() );
@@ -472,47 +443,6 @@
         }; 
     }
 
-
-    // function setPosProduce( o ) { 
-    //     return function( position ) { 
-    //         for ( const prop of Object.keys( position ) ) { 
-    //             o[ prop ] = position[ prop ]; 
-    //             setPosDOM( prop, position[ prop ] ); 
-    //         }
-    //     }
-    // }
-
-    // function setPosDOMProduce( element, units ) { 
-    //     return function( prop, value ) { 
-    //         element.style[ prop ] = value + units; 
-    //     }
-    // }
-
-    // function setPosition( units ) { 
-    //     return function( element, position ) { 
-    //         for ( const property of Object.keys( position ) ) { 
-    //             element.style[ property ] = position[ property ] + units; 
-    //         }
-    //     }; 
-    // }
-
-    // function setPosition( element, units ) { 
-    //     return function( args ) { 
-    //         for ( const property of Object.keys( args ) ) { 
-    //             element.style[ property ] = args[ property ] + units; 
-    //         }
-    //     }; 
-    // }
-
-    // function setPosition( element, units ) { 
-    //     return function( property, value ) { 
-    //         element.style[ property ] = value.toString() + units; 
-    //     }; 
-    // }
-
-    function assignPixelValue( value ) { 
-        return value + 'px';
-    }
 
     function getCSSValue( element, property ) { 
         const valueString = getComputedStyle( element ).getPropertyValue( property );
