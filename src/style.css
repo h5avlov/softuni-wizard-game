@@ -17,29 +17,38 @@ body, .game, .game-play, .game-score {
     height: 100%;
 }
 
-.game-start { 
+.game-start, .game-over { 
     padding: 1.5em 2.5em; 
     position: absolute; left: 50%; top: 50%; transform: translate( -50%, -50% );
-    z-index: 2; 
-    background-color: white; 
+    z-index: 2;  
+    color: white; 
     font-size: 1.8rem; font-weight: bold; 
-    color: red; 
     text-align: center; text-transform: uppercase;
+}
+
+.game-start { 
+    background-color: green;  
     cursor: pointer; 
+} 
+
+.game-over { 
+    background-color: red; 
 
 }
 
 .game-play { 
     z-index: 1; 
-    background-color: red;
+    background-color:lightblue;  
     overflow: hidden; 
 }
 
 .game-score { 
     box-sizing: border-box; 
+    width: auto; min-width: 8em;    
+    right: 1.25rem; left: auto; top: 1.25rem;  
     padding: 0.75em; 
-    background-color: white;
-    color: red; 
+    border: 2px solid; 
+    color: green; 
     font-size: 1.75rem; font-weight: bold; 
     text-align: center; 
 
@@ -55,7 +64,7 @@ body, .game, .game-play, .game-score {
     z-index: 3; 
     background-image: url( './images/wizard.png' ); 
     background-size: cover; 
-    background-color: blue; 
+    /* background-color: blue;  */
     overflow: hidden; 
 }
 
