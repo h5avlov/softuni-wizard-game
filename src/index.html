@@ -13,7 +13,7 @@
     <div class="game-play">
         <div class="game-score">0</div>
     </div>
-    <div class="game-over"></div>
+    <div class="game-over hidden">Game Over</div> 
 </div>
 
 <script>
@@ -378,6 +378,12 @@
 
     }
 
+    function endGame() { 
+        game.isPlaying = false; 
+        display( gameOver ); 
+    }
+    
+
     function gameMove( timestamp ) { 
 
         // player.create(); 
@@ -470,6 +476,10 @@
         const character = document.createElement( 'div' );
         character.classList.add( ...classNames ); 
         return character;
+    }
+
+    function display( element ) { 
+        element.classList.remove( 'hidden' ); 
     }
 
     // Hides an element 
