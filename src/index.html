@@ -25,7 +25,7 @@
         gameScore = getElement( '.game-score' ); 
 
     // Game related events catching
-    gameStart.addEventListener( 'click', start ); 
+    gameStart.addEventListener( 'click', startGame ); 
     document.addEventListener( 'keydown', onKeyDown );
     document.addEventListener( 'keyup', onKeyUp ); 
 
@@ -46,8 +46,8 @@
         createBugIntervalMax: 2000, 
         bugSpeedMultiplier: 2, 
         gravity: 2, 
-        wizardGravityMultiplier: 1 
-        
+        wizardGravityMultiplier: 1, 
+        isPlaying: false 
     }; 
 
     const player = ( function() { 
@@ -183,7 +183,10 @@
 
 
         function getPlayer() { 
-            return wizard; 
+            return { 
+                node: wizard, 
+                position: {} 
+            }; 
         }
 
 
@@ -621,9 +624,12 @@
     }
 
     // Starts the gameplay
-    function start() { 
+    function startGame() { 
         // Hiding the start button after click 
         hide( gameStart ); 
+
+        // Registering that game started
+        game.isPlaying = true;
 
         // Starting the game loop
         requestAnimationFrame( gameMove ); 
@@ -664,8 +670,6 @@
             player.closeFire(); 
         } 
 
-        gameActions.detectCollision( [ player ] );
-
         fireballs.moveAll(); 
 
         gameActions.detectCollision( fireballs.getAll(), bugs.getAll(), function( fireball, bug ) { 
@@ -673,6 +677,14 @@
             bugs.remove( bug ); 
             gameScore.textContent = parseInt( gameScore.textContent ) + 100; 
         } ); 
+
+        gameActions.detectCollision( [ player.getPlayer() ], bugs.getAll(), function( wizard, bug ) { 
+            endGame();
+        } ); 
+
+        if ( !game.isPlaying ) { 
+            return; 
+        }
 
         requestAnimationFrame( gameMove ); 
     }
