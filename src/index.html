@@ -182,6 +182,11 @@
         }
 
 
+        function getPlayer() { 
+            return wizard; 
+        }
+
+
         // Exporting the player functions to control its position
         return { 
             getLeft, 
@@ -192,7 +197,8 @@
             moveDown, 
             applyGravity, 
             openFire, 
-            closeFire
+            closeFire, 
+            getPlayer 
         }; 
     }() ); 
 
@@ -657,6 +663,8 @@
         } else { 
             player.closeFire(); 
         } 
+
+        gameActions.detectCollision( [ player ] );
 
         fireballs.moveAll(); 
 
